@@ -1,0 +1,18 @@
+{% extends "base_page_no_top.html" %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content_title %}
+
+{% endblock %}
+
+{% block content %}
+
+    <p>trade_kod: {{ trade_kod }}</p>
+    <p>price_type: {{ price_type }}</p>
+
+    <img src="pict_code_{{ trade_kod }}_price_{{ price_type }}">
+
+{% endblock %}

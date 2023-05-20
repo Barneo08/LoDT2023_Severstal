@@ -1,0 +1,28 @@
+{% extends "base_page_no_bottom.html" %}
+
+{% block title %}
+
+    {{ stoks_short_name }}
+
+{% endblock %}
+
+{% block content_title %}
+
+{% endblock %}
+
+{% block content %}
+
+    <p>Trade code = {{ trade_kod }}</p>
+    <p>Полное наименование: {{ stoks_full_name }}</p>
+    <p>Сокращенное наименование: {{ stoks_short_name }}</p>
+
+{% endblock %}
+
+{% if html_list %}
+    {% block content_list %}
+    Отобразить график по:
+        {% for element in html_list %}
+            <li><a href={{element[0]}} target="CONTENT">{{element[1]}}</a></li>
+        {% endfor %}
+    {% endblock %}
+{% endif %}
