@@ -11,6 +11,7 @@ __pycache__
 
 debug.logs
 requirements.bat
+run_main.bat
 *.spec
 *.pkl
 *.exe

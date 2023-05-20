@@ -1,0 +1,21 @@
+{% extends 'base_page.html' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block content_title %}
+    {{ content_title }}
+{% endblock %}
+
+{% block content %}
+    {{ content }}
+{% endblock %}
+
+{% if html_list %}
+    {% block content_list %}
+        {% for element in html_list %}
+            <li><a href={{element[0]}} target="_blank">{{element[1]}}</a></li>
+        {% endfor %}
+    {% endblock %}
+{% endif %}
