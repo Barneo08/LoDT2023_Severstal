@@ -2,7 +2,7 @@
 
 ### Хакатон "ЛИДЕРЫ ЦИФРОВОЙ ТРАНСФОРМАЦИИ"
 
-<b><h2><a href="#g_group_1">Информация о поставленновке задачи и команде</a></h2></b>
+<b><h2><a href="#g_group_1">Информация о поставленовке задачи и команде</a></h2></b>
 1. <a href="#g_team">Информация о команде</a>
 1. <a href="#g_task">Общее описание задачи</a>
 1. <a href="#g_data">Описание исходных данных</a>
@@ -12,8 +12,11 @@
 1. <a href="#g_model_estimation">Оценка модели - оценка результатов прогноза</a>
 1. <a href="#g_interface">Интерфейс. Рабочее место оператора</a>
 
+<b><h2><a href="#g_group_3">Информация для разработчика</a></h2></b>
+1. <a href="#g_dir_tree">Структура каталогов репозитория</a>
+
 ***
-<h2 id="g_group_1">Информация о поставленновке задачи и команде</h2>
+<h2 id="g_group_1">Информация о поставленовке задачи и команде</h2>
 
 <h3 id="g_team">1. Информация о команде</h3>
 
@@ -22,12 +25,12 @@
 Капитан: Михаил
 
 Участники комнады (в алфавитном порядке): Артём, Дмитрий, Екатерина, Татьяна
-![Main form](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/TeamInfo.png)
+![Main form](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/picts/TeamInfo.png)
 
 <h3 id="g_task">2. Общее описание задачи</h3>
 Задача №15: Модель раннего обнаружения неисправностей промышленного оборудования
 
-![Main form](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/ProjectInfo.png?raw=true)
+![Main form](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/picts/ProjectInfo.png?raw=true)
 
 ***
 <h3 id="g_data">3. Описание исходных данных</h3>
@@ -45,3 +48,9 @@
 <h3 id="g_interface">6. Интерфейс. Рабочее место оператора</h3>
 Здесь будет информация о реализованном Интерфейсе.
 
+<h2 id="g_group_3">Информация для разработчика</h2>
+
+<h3 id="g_dir_tree"">7. Структура каталогов репозитория</h3>
+Здесь будет информация о том как организован код и расположение ресурсов
+
+![DirTree](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/picts/DirTree.png?raw=tru)
