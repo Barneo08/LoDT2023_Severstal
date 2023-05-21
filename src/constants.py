@@ -1,7 +1,6 @@
 from datetime import timedelta
 import datetime
 
-
 SENSOR_LIST = {
     "ЭКСГАУСТЕР 4. ТОК РОТОРА 1": {"BDName": "Э4.iР1", "DispName": ""},
     "ЭКСГАУСТЕР 4. ТОК РОТОРА2": {"BDName": "Э4.iР2", "DispName": ""},
@@ -155,46 +154,10 @@ PERIOD_TYPES = {
 
 DEFAULT_PERIOD_TYPE = PERIOD_TYPES["Час"]
 
-API_URL = "https://mfd.ru/export/handler.ashx/DataFile.txt?"
-API_PARAMS = {
-    "TickerGroup": "16",
-    "Tickers": "330",
-    "Alias": "False",
-    "Period": "7",
-    "timeframeValue": "1,",
-    "timeframeDatePart": "day",
-    "StartDate": "01.06.2019",
-    "EndDate": "09.06.2019",
-    "SaveFormat": "0",
-    "SaveMode": "0",
-    "FileName": "FileWithData.txt",
-    "FieldSeparator": ";",
-    "DecimalSeparator": ".",
-    "DateFormat": "yyyyMMdd",
-    "TimeFormat": "HHmmss",
-    "DateFormatCustom": "",
-    "TimeFormatCustom": "",
-    "AddHeader": "true",
-    "RecordFormat": "0",
-    "Fill": "false"
-}
-API_PARAMS_DATE_FORMAT = "%d.%m.%Y"
-
 DATE_FORMAT_SLASH = "%Y/%m/%d"
 DATETIME_FORMAT_SLASH = "%Y/%m/%d %H:%M:%S"
 DATETIME_FORMAT_DASH = "%Y-%m-%d %H:%M:%S"
 DATETIME_FORMAT_IN_DB = DATETIME_FORMAT_DASH
-
-FIRST_DAY_OF_PREDICTION_DATASET = (datetime.date.today() - datetime.timedelta(days=170)).strftime(DATE_FORMAT_SLASH)
-FIRST_DAY_OF_PLOT = (datetime.date.today() - datetime.timedelta(days=7)).strftime(DATE_FORMAT_SLASH)
-
-FIRST_DAY_IN_HISTORY = FIRST_DAY_OF_PREDICTION_DATASET
-FIRST_DATETIME_IN_HISTORY = FIRST_DAY_OF_PREDICTION_DATASET + " 9:00:00"
-
-MAX_LAG_FOR_PREDICTION = 9*100
-DEPTH_OF_PREDICTION = 9*2 # Два дня
-PREDICTION_STEP = timedelta(hours=1)
-NEXT_DAY_AFTER_PREDICTION = datetime.datetime.today()+timedelta(hours=DEPTH_OF_PREDICTION+1)
 
 MODULES_PARAM_GROUPS = {
     "initdb": ["db", "constants", "utils"],

@@ -76,7 +76,17 @@ class DataHandler:
         
         cur = self._connector.cursor()
         try:
-            cur.execute("CREATE TABLE IF NOT EXISTS STOCKS (trade_kod TEXT NOT NULL PRIMARY KEY, mfd_id INTEGER NOT NULL, full_name TEXT NOT NULL, short_name TEXT NOT NULL, order_field INTEGER NOT NULL, phidden INTEGER NOT NULL)")
+            # Создадим таблицу для хранения сырых данных из файла X_train
+            # Первый столбец это ДатаВремя, а все остальные - это float64
+            # Их имен возьмём из constants.SENSOR_LIST
+            sql_create_string = "CREATE TABLE IF NOT EXISTS X_TRAIN (DT TIMESTAMP NOT NULL PRIMARY KEY ##ALL_OTHER##)"
+            sql_help_str = ""
+            for element in constants.SENSOR_LIST.keys():
+                sql_help_str = sql_help_str + f", {constants.SENSOR_LIST[element]['BDName']} REAL NOT NULL"
+
+            # cur.execute(sql_create_string)
+
+            # cur.execute("CREATE TABLE IF NOT EXISTS X_TRAIN (trade_kod TEXT NOT NULL PRIMARY KEY, mfd_id INTEGER NOT NULL, full_name TEXT NOT NULL, short_name TEXT NOT NULL, order_field INTEGER NOT NULL, phidden INTEGER NOT NULL)")
         except:
             print("create_tables: При создании таблицы STOCKS возникла ошибка.")
             return False
