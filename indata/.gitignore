@@ -2,6 +2,8 @@
 .vscode
 .vs
 .idea
+.ipynb_checkpoints
+
 _tmp_*.*
 ~_tmp_*.*
 __pycache__
