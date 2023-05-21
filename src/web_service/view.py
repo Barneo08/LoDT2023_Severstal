@@ -5,7 +5,7 @@ from flask import render_template
 @app.route("/")
 def index():
     title = "Стартовая страница"
-    content_title = "content_title"
+    content_title = "content_title."
     content = "Здесь должен быть контент. Вот список:"
 
     stocks_list = [["First", "1111", "Иванов"], ["Second", "2222", "Петров"], ["Third", "3333", "Сидоров"]]
