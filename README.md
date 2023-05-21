@@ -58,9 +58,6 @@
 
 ![DirTree](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/picts/DirTree.png?raw=tru)
 
-<h3 id="g_dir_tree">7. Структура каталогов репозитория</h3>
-Здесь будет информация о том как организован код и расположение ресурсов
-
 <h3 id="g_test">8. Реализованные тесты</h3>
 Здесь будет информация о том как реализованы тесты
 
