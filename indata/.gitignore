@@ -1,0 +1,15 @@
+.env_*
+.vscode
+.vs
+.idea
+_tmp_*.*
+~_tmp_*.*
+__pycache__
+
+*.log*
+*.pkl
+*.zip
+*.sln
+*.parquet
+*.xls*
+
