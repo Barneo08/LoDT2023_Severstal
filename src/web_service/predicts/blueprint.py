@@ -13,7 +13,7 @@ import src.db as db
 predicts = Blueprint("predicts", __name__, template_folder="templates")
 
 if "db_connection" not in locals():
-    db_connection = db.Data_handler()
+    db_connection = db.DataHandler()
 
 @predicts.route("/")
 def index():

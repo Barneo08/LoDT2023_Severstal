@@ -17,7 +17,7 @@ def make_prediction():
         Do prediction for each stock
     """
     otimer = utils.Timer("Get started process of stocs's prices prediction:")
-    dh = db.Data_handler()
+    dh = db.DataHandler()
     stocks_list = dh.get_stocks_list()
     for one_stoks in stocks_list:
         print("\nPredicting prices for {}, {}".format(one_stoks[0], one_stoks[2]))
