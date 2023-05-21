@@ -1,7 +1,9 @@
 import datetime
-import os
 import sys
 import time
+import logging
+
+from src.config import *
 
 
 def prepare_df(df):
@@ -14,7 +16,8 @@ def prepare_df(df):
                 ("<VOL>" in columns_list)
             ):
         print("prepare_df: Указанный файл не содержит нужных столбцов.")
-        return(False)
+        return False
+
     if not ("<OPEN>" in columns_list): df["<OPEN>"] = df["<CLOSE>"]
     if not ("<HIGH>" in columns_list): df["<HIGH>"] = df["<CLOSE>"]
     if not ("<LOW>" in columns_list): df["<LOW>"] = df["<CLOSE>"]
@@ -28,7 +31,8 @@ def prepare_df(df):
     # Вернём только нужные столбцы и в нужном порядке.
     if not ("ppredict" in columns_list):
         df["ppredict"] = 0
-    return(df[["<DT>", "<OPEN>", "<HIGH>", "<LOW>", "<CLOSE>", "<VOL>", "ppredict"]])
+    return df[["<DT>", "<OPEN>", "<HIGH>", "<LOW>", "<CLOSE>", "<VOL>", "ppredict"]]
+
 
 class Timer():
     """
@@ -61,12 +65,12 @@ class Timer():
 
 def d2dt(date):
     # Преобразование даты в ДатаВремя
-    return(datetime.datetime(date.year, date.month, date.day))
+    return datetime.datetime(date.year, date.month, date.day)
 
 
 def last_second_of_date(date):
-    # ЭПолучение последнего мгновения (секунды) в указанных суткахЭ
-    return(d2dt(date) + datetime.timedelta(days=1) - datetime.timedelta(seconds=1))
+    # Получение последнего мгновения (секунды) в указанных сутках
+    return d2dt(date) + datetime.timedelta(days=1) - datetime.timedelta(seconds=1)
 
 
 def if_module_exist(module_name):
@@ -77,9 +81,9 @@ def if_module_exist(module_name):
     # Проверим их наличие:
     if not os.path.exists(root_module) and not (os.path.isdir(folder_module) and os.path.exists(init_in_folder_module)):
         print(f"There is no module or package '{module_name}'.")
-        return(False)
+        return False
     else:
-        return(True)
+        return True
 
 
 def if_all_modules_exist(modules_list):
@@ -90,14 +94,19 @@ def if_all_modules_exist(modules_list):
         if not if_module_exist(one_module):
             p_flag = False
             break
-    return(p_flag)
+    return p_flag
 
 
-def log_print(text, to_screen=True, to_log=True):
+def log_print(text, module_name="NoModuleInfo", to_screen=True):
     """
-    Данная функция должна заниматься регистрацией (логированием) событий,
-    но, возможно будут просто заменена стандартной библиотекой.
+    Упрощение логирования событий, при необходимости вывод на экран.
     """
     if to_screen:
-        print(text)
-        
+        print(f"{module_name}:", text)
+
+    if CONFIG.DEBUG:
+        logging.debug(f"{module_name}: {text}")
+
+
+def get_home_dir():
+    return os.path.abspath(os.curdir)
