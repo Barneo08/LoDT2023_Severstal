@@ -24,7 +24,8 @@
 
 <h3 id="g_task">2. Общее описание задачи</h3>
 Задача №15: Модель раннего обнаружения неисправностей промышленного оборудования
-![Main form](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/ProjectInfo.png)
+
+![Main form](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/ProjectInfo.png?raw=true)
 
 ***
 <h3 id="g_data">3. Описание исходных данных</h3>
