@@ -14,13 +14,18 @@ else:
         DB_FULL_PATH = "DBase"
         RAW_DATA_FULL_PATH = "indata"
 
-        SQL_SERVER_TYPE = "PostgreSQL"  # (SQLite, PostgreSQL)
-        SQL_SERVER_HOST = "localhost"
-        SQL_SERVER_USERNAME = "postgres"
-        SQL_SERVER_PASSWORD = "123"
-        SQL_SERVER_DB_NAME = "SeverStal_DB"
+        SQL_SERVER_TYPE_USED = "SQLite"  # (SQLite, PostgreSQL)
+        SQL_SERVER_DB_NAME = "SeverStal_DB",
+
+        PostgreSQL = {
+            "SQL_SERVER_HOST": "localhost",
+            "SQL_SERVER_USERNAME": "postgres",
+            "SQL_SERVER_PASSWORD": "123",
+        }
+
         UPLOAD_ROWS = 1_000_000
-        RAW_FILES_UPLOAD_ENABLED = True
+        RAW_FILES_UPLOAD_ENABLED = False
+        DB_READY = False
 
         def __init__(self):
             if self.DEBUG:
