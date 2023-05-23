@@ -19,12 +19,20 @@ class DataHandler:
     engine = None
     sql_alchemy = None
 
-
-    def __init__(self, sql_server="SQLite"):
+    def __init__(self, sql_server=None):
         """
         Объект класса позволяет работать с базой данных.
         """
-        self.sql_server = sql_server
+
+        if CONFIG.DB_READY:
+            self.sql_server = CONFIG.SQL_SERVER_TYPE_USED
+        else:
+            if sql_server is None:
+                utils.log_print("Не удалось подготовить информацию о расположении базы данных.", module_name="intDB")
+                return
+            else:
+                self.sql_server = sql_server
+
         self.get_handle()
         self.create_tables()
         
@@ -45,7 +53,7 @@ class DataHandler:
             ret_path = os.path.join(dbase_path, CONFIG.SQL_SERVER_DB_NAME)
             return ret_path
         except OSError:
-            print("Не удалось подготовить информацию о расположении базы данных.")
+            utils.log_print("Не удалось подготовить информацию о расположении базы данных.", module_name="get_dbase_path")
             return ""
 
     def __del__(self):
@@ -71,11 +79,15 @@ class DataHandler:
                 self.connector = self.engine.connect()
             elif self.sql_server.upper() == "PostgreSQL".upper():
                 self.sql_alchemy = True
-                engine_data = f"{CONFIG.SQL_SERVER_USERNAME}:{CONFIG.SQL_SERVER_PASSWORD}@{CONFIG.SQL_SERVER_HOST}/{CONFIG.SQL_SERVER_DB_NAME}"
+                user_name = CONFIG.PostgreSQL["SQL_SERVER_USERNAME"]
+                password = CONFIG.PostgreSQL["SQL_SERVER_PASSWORD"]
+                host = CONFIG.PostgreSQL["SQL_SERVER_HOST"]
+                db_name = CONFIG.SQL_SERVER_DB_NAME
+                engine_data = f"{user_name}:{password}@{host}/{db_name}"
                 self.engine = create_engine(f"postgresql+psycopg2://{engine_data}")
                 self.connector = self.engine.connect()
         except BaseException:
-            print("get_connector: Возникла проблема с подключением к базе данных.")
+            utils.log_print("get_connector: Возникла проблема с подключением к базе данных.", module_name="get_handle")
             if self.connector is None or self.engine is None:
                 self.close_handle()
             return False
@@ -83,7 +95,7 @@ class DataHandler:
             print("Установили соединение с БД.")
             return True
         else:
-            print("get_connector: При установлении связи с БД возникли ошибки.")
+            utils.log_print("get_connector: При установлении связи с БД возникли ошибки.", module_name="get_handle")
             return False
 
     def execute(self, sql_command):
@@ -104,6 +116,14 @@ class DataHandler:
     def rollback(self):
         if self.connector:
             self.connector.rollback()
+
+    @staticmethod
+    def get_exh_list():
+        """
+        Возвращает словарь со списком эксгаутеров в качестве ключей
+        и их идентификаторов в качестве значений
+        """
+        return constants.E_DICT
 
     def create_tables(self):
         """
@@ -141,7 +161,7 @@ class DataHandler:
 
         """
         if not self.connector:
-            print("add_row: У данного объекта отсутствует коннектор.")
+            utils.log_print("add_row: У данного объекта отсутствует коннектор.", module_name="add_row")
             return False
 
         table_name = table_name.replace(" ", "").upper()
@@ -167,12 +187,12 @@ class DataHandler:
                 cur.execute("INSERT INTO STOCKS_PRICES (mfd_id, price_dt, id_period_type, price_open, price_min, price_max, price_close, vol, ppredict) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (data["mfd_id"], data["price_dt"], data["id_period_type"], data["price_open"], data["price_min"], data["price_max"], data["price_close"], data["vol"], data["ppredict"]))
             else:
-                print("add_row: Попытка добавить данные в несуществующую таблицу: " + table_name)
+                utils.log_print("Попытка добавить данные в несуществующую таблицу: " + table_name, module_name="add_row")
                 return False
         try:
             pass
         except (sqlite.Error, sqlite.ProgrammingError, sqlite.DatabaseError, sqlite.IntegrityError, sqlite.OperationalError, sqlite.NotSupportedError):
-            print(f"add_row: При добавлении строки в таблицу {table_name} возникла ошибка.")
+            utils.log_print(f"add_row: При добавлении строки в таблицу {table_name} возникла ошибка.", module_name="add_row")
             if not donot_commit:
                 self.connector.rollback()
 
