@@ -5,8 +5,7 @@ import src.utils as utils
 
 import sqlite3 as sqlite
 # (sqlite.Error, sqlite.ProgrammingError, sqlite.DatabaseError, sqlite.IntegrityError, sqlite.OperationalError, sqlite.NotSupportedError)
-import psycopg2
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 
 class DataHandler:
@@ -17,13 +16,16 @@ class DataHandler:
     а справочники заполнены.
     """
     connector = None
+    engine = None
+    sql_alchemy = None
+
 
     def __init__(self, sql_server="SQLite"):
         """
         Объект класса позволяет работать с базой данных.
         """
         self.sql_server = sql_server
-        self.get_connector()
+        self.get_handle()
         self.create_tables()
         
         # Добавим данные в справочники.
@@ -36,10 +38,11 @@ class DataHandler:
     @staticmethod
     def get_dbase_path():
         try:
-            if not os.path.isdir(CONFIG.DB_FULL_PATH):
-                os.makedirs(CONFIG.DB_FULL_PATH)
+            dbase_path = os.path.abspath(CONFIG.DB_FULL_PATH)
+            if not os.path.isdir(dbase_path):
+                os.makedirs(dbase_path)
 
-            ret_path = os.path.join(CONFIG.DB_FULL_PATH, CONFIG.SQL_SERVER_DB_NAME)
+            ret_path = os.path.join(dbase_path, CONFIG.SQL_SERVER_DB_NAME)
             return ret_path
         except OSError:
             print("Не удалось подготовить информацию о расположении базы данных.")
@@ -50,42 +53,57 @@ class DataHandler:
         При уничтожении экземпляра класса
         закрывается соединение с базой данных.
         """
-        self.close_connection()
+        self.close_handle()
         print("Закрыли соединение с БД.")
 
-    def get_connector(self):
+    def get_handle(self):
         """
         Подключение к базе данных.
         """
         try:
             if self.sql_server.upper() == "SQLite".upper():
+                self.sql_alchemy = False
                 self.connector = sqlite.connect(self.get_dbase_path(), check_same_thread=False)
+            elif self.sql_server.upper() == "SQLite+SQLAlchemy".upper():
+                self.sql_alchemy = True
+                engine_data = self.get_dbase_path()
+                self.engine = create_engine(f"sqlite:///{engine_data}")
+                self.connector = self.engine.connect()
             elif self.sql_server.upper() == "PostgreSQL".upper():
+                self.sql_alchemy = True
                 engine_data = f"{CONFIG.SQL_SERVER_USERNAME}:{CONFIG.SQL_SERVER_PASSWORD}@{CONFIG.SQL_SERVER_HOST}/{CONFIG.SQL_SERVER_DB_NAME}"
-                self.connector = create_engine(f"postgresql+psycopg2://{engine_data}")
-        except sqlite.Error:
+                self.engine = create_engine(f"postgresql+psycopg2://{engine_data}")
+                self.connector = self.engine.connect()
+        except BaseException:
             print("get_connector: Возникла проблема с подключением к базе данных.")
-            if self.connector:
-                self.close_connection()
+            if self.connector is None or self.engine is None:
+                self.close_handle()
             return False
-        if self.connector:
+        if self.connector or self.engine:
             print("Установили соединение с БД.")
             return True
         else:
             print("get_connector: При установлении связи с БД возникли ошибки.")
             return False
 
-    def close_connection(self):
-        if self.sql_server.upper() == "SQLite".upper():
+    def execute(self, sql_command):
+        if self.connector:
+            if self.sql_alchemy:
+                self.connector.execute(text(sql_command))
+            else:
+                self.connector.execute(sql_command)
+
+    def close_handle(self):
+        if self.connector:
             self.connector.close()
-        elif self.sql_server.upper() == "PostgreSQL".upper():
-            pass
 
     def commit(self):
-        self.connector.commit()
+        if self.connector:
+            self.connector.commit()
 
     def rollback(self):
-        self.connector.rollback()
+        if self.connector:
+            self.connector.rollback()
 
     def create_tables(self):
         """

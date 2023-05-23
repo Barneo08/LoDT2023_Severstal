@@ -113,3 +113,7 @@ def log_print(text, module_name="NoModuleInfo", to_screen=True):
 
 def get_home_dir():
     return os.path.abspath(os.curdir)
+
+
+def sep_digits(num, sep=" "):
+    return '{0:,}'.format(num).replace(',', sep)

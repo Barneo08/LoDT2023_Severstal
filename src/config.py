@@ -16,6 +16,7 @@ class CommonConfiguration(object):
     SQL_SERVER_USERNAME = "postgres"
     SQL_SERVER_PASSWORD = "123"
     SQL_SERVER_DB_NAME = "SeverStal_DB"
+    UPLOAD_ROWS = 1_000_000
 
     def __init__(self):
         if self.DEBUG:
