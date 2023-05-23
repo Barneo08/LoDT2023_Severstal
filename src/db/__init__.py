@@ -18,12 +18,13 @@ class DataHandler:
     connector = None
     engine = None
     sql_alchemy = None
+    keep_silence = None
 
-    def __init__(self, sql_server=None):
+    def __init__(self, sql_server=None, keep_silence=True):
         """
         Объект класса позволяет работать с базой данных.
         """
-
+        self.keep_silence = keep_silence
         if CONFIG.DB_READY:
             self.sql_server = CONFIG.SQL_SERVER_TYPE_USED
         else:
@@ -61,8 +62,10 @@ class DataHandler:
         При уничтожении экземпляра класса
         закрывается соединение с базой данных.
         """
-        self.close_handle()
-        print("Закрыли соединение с БД.")
+        if self.connector:
+            self.close_handle()
+            if not self.keep_silence:
+                print("Закрыли соединение с БД.")
 
     def get_handle(self):
         """
@@ -92,7 +95,8 @@ class DataHandler:
                 self.close_handle()
             return False
         if self.connector or self.engine:
-            print("Установили соединение с БД.")
+            if not self.keep_silence:
+                print("Установили соединение с БД.")
             return True
         else:
             utils.log_print("get_connector: При установлении связи с БД возникли ошибки.", module_name="get_handle")
@@ -123,7 +127,27 @@ class DataHandler:
         Возвращает словарь со списком эксгаутеров в качестве ключей
         и их идентификаторов в качестве значений
         """
-        return constants.E_DICT
+        ret_dict = {"Names": [], "IDs": []}
+        exh_list = sorted(constants.E_DICT.keys())
+        for exh in exh_list:
+            ret_dict["Names"].append(exh)
+            ret_dict["IDs"].append(constants.E_DICT[exh])
+
+        return ret_dict
+
+    @staticmethod
+    def get_exh_tp_list(exh_id=None):
+        if exh_id is None:
+            return {"НЕ ПЕРЕДАН ИДЕНТИФИКАТОР ЭКСГАУСТЕРА": "НЕ ПЕРЕДАН ИДЕНТИФИКАТОР ЭКСГАУСТЕРА"}
+
+        ret_dict = {"Names": [], "IDs": []}
+        tp_list = sorted(constants.Y_LIST.keys())
+        for key in tp_list:
+            if constants.Y_LIST[key][:len(exh_id)] == exh_id:
+                ret_dict["Names"].append(key)
+                ret_dict["IDs"].append(constants.Y_LIST[key])
+
+        return ret_dict
 
     def create_tables(self):
         """

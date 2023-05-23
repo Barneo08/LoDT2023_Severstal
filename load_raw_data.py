@@ -24,7 +24,7 @@ def load_data(sql_server_type):
     else:
         # Создаём объект для работы с БД
         import src.db as db
-        dh = db.DataHandler(sql_server_type)
+        dh = db.DataHandler(sql_server_type, keep_silence=False)
 
         conf = {
             "X_TRAIN_RAW": {"raw_data_file": "x_train.parquet", "columns_subs": constants.SENSOR_FIELD_NAMES_LIST},
