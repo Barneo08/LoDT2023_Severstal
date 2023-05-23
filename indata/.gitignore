@@ -5,6 +5,7 @@
 .ipynb_checkpoints
 
 _tmp_*.*
+_local_*.*
 ~_tmp_*.*
 __pycache__
 
@@ -14,5 +15,4 @@ __pycache__
 *.sln
 *.parquet
 *.xls*
-
-load_and_view_raw_data.ipynb
+*.ipynb
