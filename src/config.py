@@ -15,7 +15,7 @@ else:
         RAW_DATA_FULL_PATH = "indata"
 
         SQL_SERVER_TYPE_USED = "SQLite"  # (SQLite, PostgreSQL)
-        SQL_SERVER_DB_NAME = "SeverStal_DB",
+        SQL_SERVER_DB_NAME = "SeverStal_DB"
 
         PostgreSQL = {
             "SQL_SERVER_HOST": "localhost",
