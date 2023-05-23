@@ -18,7 +18,6 @@ def load_data(sql_server_type):
         print("Terminated.")
         return
 
-    return
     utils.log_print(f"Starting loading raw data to DBase ({sql_server_type})...", module_name=module_name)
     if not utils.if_all_modules_exist(constants.MODULES_PARAM_GROUPS["initdb"]):
         utils.log_print("One of the modules is missing. The program is terminated.", module_name="Load raw data to DB")
@@ -30,6 +29,7 @@ def load_data(sql_server_type):
         conf = {
             "X_TRAIN_RAW": {"raw_data_file": "x_train.parquet", "columns_subs": constants.SENSOR_FIELD_NAMES_LIST},
             "Y_TRAIN_RAW": {"raw_data_file": "y_train.parquet", "columns_subs": constants.Y_LIST},
+            "X_TEST_RAW": {"raw_data_file": "x_train.parquet", "columns_subs": constants.SENSOR_FIELD_NAMES_LIST},
         }
 
         for raw_table_name in conf.keys():
@@ -50,7 +50,7 @@ def load_data(sql_server_type):
             print(f"Количество строк для загрузки: {utils.sep_digits(rows)} шт.")
             print(f"Загрузка осуществляется блоками по {utils.sep_digits(CONFIG.UPLOAD_ROWS)} строк.")
 
-            for element in constants.E_LIST:
+            for element in constants.E_LIST_ID:
                 # Получим префикс (имя) для эксгаустера
                 e_name = element + constants.EXH_SEPARATOR
                 # Отберём колонки в данных, которые начинаются с этого имени
