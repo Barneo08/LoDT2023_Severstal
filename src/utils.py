@@ -34,17 +34,20 @@ def prepare_df(df):
     return df[["<DT>", "<OPEN>", "<HIGH>", "<LOW>", "<CLOSE>", "<VOL>", "ppredict"]]
 
 
-class Timer():
+class Timer:
     """
     Создаётся объект, который позволяет
-    засекать вреям и отображать сколько
-    времени прошло в читаемом формате/
+    засекать время и отображать сколько
+    времени прошло в читаемом формате.
     """
-    def __init__(self, timer_name=""):
+    def __init__(self, timer_name="", only_on_show=True):
         self.timer_name = timer_name
         self.start_position_of_timer = time.time()
         duration_in_seconds = int(time.time() - self.start_position_of_timer)
-        self.print_text(duration_in_seconds)
+        if only_on_show:
+            pass
+        else:
+            self.print_text(duration_in_seconds)
 
     def show(self):
         # Функция для отображения времени
