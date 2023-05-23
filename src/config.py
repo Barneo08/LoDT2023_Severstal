@@ -8,7 +8,14 @@ class FlaskConfiguration(object):
 
 class CommonConfiguration(object):
     DEBUG = True
-    DB_FULL_PATH = ""
+    DB_FULL_PATH = "DBase"
+    RAW_DATA_FULL_PATH = "indata"
+
+    SQL_SERVER_TYPE = "PostgreSQL"  # (SQLite, PostgreSQL)
+    SQL_SERVER_HOST = "localhost"
+    SQL_SERVER_USERNAME = "postgres"
+    SQL_SERVER_PASSWORD = "123"
+    SQL_SERVER_DB_NAME = "SeverStal_DB"
 
     def __init__(self):
         if self.DEBUG:
