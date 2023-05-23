@@ -17,6 +17,7 @@
 1. <a href="#g_test">Реализованные тесты</a>
 1. <a href="#g_code_format">Форматирование кода в проекте</a>
 1. <a href="#g_type_annotation">Аннотация типов в коде</a>
+1. <a href="#g_data_loading">Загрузка 'сырых' исходных данных</a>
 
 ***
 <h2 id="g_group_1">Информация о поставке задачи и команде</h2>
@@ -67,3 +68,7 @@
 <h3 id="g_type_annotation">10. Аннотация типов в коде</h3>
 Здесь будет информация о том как организована аннотация типов в коде
 
+<h3 id="g_data_loading">11. Загрузка 'сырых' исходных данных</h3>
+Здесь будет информация о том как происходит загрузка первичных данных
+
+![DirTree](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/picts/Data2SQLServer.png?raw=tru)
