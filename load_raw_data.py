@@ -1,8 +1,10 @@
+import sys
 import pandas as pd
-import src.constants as constants
-from src.config import *
-import src.utils as utils
 from tqdm import tqdm
+
+from src.config import *
+import src.constants as constants
+import src.utils as utils
 
 
 def load_data(sql_server_type):
@@ -56,16 +58,58 @@ def load_data(sql_server_type):
                 for num in tqdm(range(int(rows / CONFIG.UPLOAD_ROWS) + 1), ncols=75, desc=f"Эксгаузер: {element}"):
                     data_2_sql(num * CONFIG.UPLOAD_ROWS, (num * CONFIG.UPLOAD_ROWS) + CONFIG.UPLOAD_ROWS)
 
-
         # Выведем информацию о времени исполнения блока кода:
         timer.show()
 
 
-print("\n\n")
-load_data("SQLite")
+if len(sys.argv) == 1:
+    print("--------------------------------------------")
+    print("Are you sure want to upload the raw data")
+    print("to the database for further processing?")
+    print()
+    print("By default, the data will be loaded to the SQLite.")
+    print("You can select PostgreSQL if you run the program with:")
+    print("--server PostgreSQL")
+    print()
+    print("Press 'Y' if yes:")
+    print("--------------------------------------------")
+    pressed_key = input().upper().replace(" ", "")
+    if pressed_key == "Y":
+        load_data("SQLite")
+    else:
+        print("Terminated.")
+else:
+    if len(sys.argv) == 2:
+        print("Not enough parameters.")
+        sys.exit(1)
 
-print("\n\n\n")
-load_data("PostgreSQL")
+    elif len(sys.argv) == 3:
+        param_name = sys.argv[1].upper().replace(" ", "")
+        param_value = sys.argv[2].replace(" ", "")
 
-print("\n\n")
-load_data("SQLite+SQLAlchemy")
+        if param_name.upper() == "--server".upper() or param_name == "-s".upper():
+            if param_value.upper() not in ["SQLite".upper(), "PostgreSQL".upper(), "SQLite+SQLAlchemy".upper()]:
+                print()
+                print(f"{param_value}: Unknown server type. Terminated.")
+            else:
+                print("--------------------------------------------")
+                print("All data will be deleted and reloaded.")
+                if param_value.upper() == "SQLite".upper():
+                    print("Uploading will take up to 20 minutes.")
+                else:
+                    print("Uploading will take up to 100 minutes.")
+                print()
+                print("Press 'Y' if yes:")
+                print("--------------------------------------------")
+
+                pressed_key = input().upper().replace(" ", "")
+                if pressed_key == "Y":
+                    load_data(param_value)
+                else:
+                    print("Terminated.")
+        else:
+            print("Error. Unknown parameter.")
+            sys.exit(1)
+    else:
+        print("Too many parameters.")
+        sys.exit(1)

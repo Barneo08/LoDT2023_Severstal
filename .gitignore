@@ -10,6 +10,8 @@ _tmp_Picts
 __pycache__
 DBase
 
+*.bat
+
 debug.logs
 requirements.bat
 run_main.bat
