@@ -8,6 +8,7 @@ _tmp_*.*
 _local_*.*
 _tmp_Picts
 __pycache__
+DBase
 
 debug.logs
 requirements.bat
