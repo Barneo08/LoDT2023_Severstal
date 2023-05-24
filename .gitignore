@@ -26,3 +26,4 @@ run_main.bat
 *.parquet
 *.xls*
 
+venv
