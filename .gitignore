@@ -1,4 +1,6 @@
 .env_*
+env*
+venv*
 .vscode
 .vs
 .idea
@@ -25,5 +27,3 @@ run_main.bat
 *.sln
 *.parquet
 *.xls*
-
-venv
