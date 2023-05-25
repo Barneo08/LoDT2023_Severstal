@@ -19,6 +19,7 @@ class DataHandler:
     engine = None
     sql_alchemy = None
     keep_silence = None
+    cursor = None
 
     def __init__(self, sql_server=None, keep_silence=True):
         """
@@ -89,6 +90,8 @@ class DataHandler:
                 engine_data = f"{user_name}:{password}@{host}/{db_name}"
                 self.engine = create_engine(f"postgresql+psycopg2://{engine_data}")
                 self.connector = self.engine.connect()
+
+            self.cursor = self.connector.cursor()
         except BaseException:
             utils.log_print("get_connector: Возникла проблема с подключением к базе данных.", module_name="get_handle")
             if self.connector is None or self.engine is None:
@@ -127,13 +130,12 @@ class DataHandler:
         Возвращает словарь со списком эксгаутеров в качестве ключей
         и их идентификаторов в качестве значений
         """
-        ret_dict = {"Names": [], "IDs": []}
+        ret_list = []
         exh_list = sorted(constants.E_DICT.keys())
         for exh in exh_list:
-            ret_dict["Names"].append(exh)
-            ret_dict["IDs"].append(constants.E_DICT[exh])
+            ret_list.append({"name": exh, "id": constants.E_DICT[exh]})
 
-        return ret_dict
+        return ret_list
 
     @staticmethod
     def get_exh_tp_list(exh_id=None):
