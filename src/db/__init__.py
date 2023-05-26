@@ -7,6 +7,9 @@ import sqlite3 as sqlite
 # (sqlite.Error, sqlite.ProgrammingError, sqlite.DatabaseError, sqlite.IntegrityError, sqlite.OperationalError, sqlite.NotSupportedError)
 from sqlalchemy import create_engine, text
 
+from datetime import datetime, timedelta
+import random
+
 
 class DataHandler:
     """
@@ -148,6 +151,36 @@ class DataHandler:
             if constants.Y_LIST[key][:len(exh_id)] == exh_id:
                 ret_dict["Names"].append(key)
                 ret_dict["IDs"].append(constants.Y_LIST[key])
+
+        return ret_dict
+
+
+    def get_exh_events(self, exh_tp_id=None, dt_start=(datetime.now() - timedelta(hours=1)), dt_end=datetime.now()):
+        if exh_tp_id is None:
+            print("Необходимо указать идентификатор технического места.")
+
+        minutes = int((dt_end - dt_start).total_seconds() / 60)
+        m1 = sorted(random.sample(range(1, minutes), 1))
+        m3 = sorted(random.sample(range(1, minutes), 2))
+
+        ds1 = sorted(random.sample(range(1, minutes), 5))
+        ds2 = sorted(random.sample(range(1, minutes), 5))
+
+        dsv1 = random.sample(range(1, 10), 5)
+        dsv2 = random.sample(range(7, 15), 5)
+
+        def get_dt_sequence(dt_begin, minutes_list):
+            ret_list = []
+            for one_minute in minutes_list:
+                ret_list.append(dt_begin + timedelta(minutes=one_minute))
+            return ret_list
+
+        ret_dict = {
+            "data_sequence1": {"dt": get_dt_sequence(dt_start, ds1), "values": dsv1},
+            "data_sequence2": {"dt": get_dt_sequence(dt_start, ds2), "values": dsv2},
+            "M1": {"dt": get_dt_sequence(dt_start, m1)},
+            "M3": {"dt": get_dt_sequence(dt_start, m3)},
+        }
 
         return ret_dict
 
