@@ -53,6 +53,7 @@ class Timer:
         # Функция для отображения времени
         duration_in_seconds = int(time.time() - self.start_position_of_timer)
         self.print_text(duration_in_seconds)
+        print()
 
     def print_text(self, duration_in_seconds):
         print_timer_str = "--- {0:0>2}:{1:0>2} ---".format(duration_in_seconds // 60, duration_in_seconds % 60)

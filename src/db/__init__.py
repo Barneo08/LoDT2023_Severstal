@@ -154,20 +154,13 @@ class DataHandler:
 
         return ret_dict
 
-
     def get_exh_events(self, exh_tp_id=None, dt_start=(datetime.now() - timedelta(hours=1)), dt_end=datetime.now()):
         if exh_tp_id is None:
             print("Необходимо указать идентификатор технического места.")
 
         minutes = int((dt_end - dt_start).total_seconds() / 60)
-        m1 = sorted(random.sample(range(1, minutes), 1))
-        m3 = sorted(random.sample(range(1, minutes), 2))
-
-        ds1 = sorted(random.sample(range(1, minutes), 5))
-        ds2 = sorted(random.sample(range(1, minutes), 5))
-
-        dsv1 = random.sample(range(1, 10), 5)
-        dsv2 = random.sample(range(7, 15), 5)
+        m1 = sorted(random.sample(range(1, minutes), random.randint(1, 3)))
+        m3 = sorted(random.sample(range(1, minutes), random.randint(3, 20)))
 
         def get_dt_sequence(dt_begin, minutes_list):
             ret_list = []
@@ -176,8 +169,6 @@ class DataHandler:
             return ret_list
 
         ret_dict = {
-            "data_sequence1": {"dt": get_dt_sequence(dt_start, ds1), "values": dsv1},
-            "data_sequence2": {"dt": get_dt_sequence(dt_start, ds2), "values": dsv2},
             "M1": {"dt": get_dt_sequence(dt_start, m1)},
             "M3": {"dt": get_dt_sequence(dt_start, m3)},
         }
