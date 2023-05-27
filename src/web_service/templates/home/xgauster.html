@@ -7,7 +7,7 @@
 
 {% block content %}
     <div class="content">
-        <div class="row">
+        <div id="dbord" class="row">
             {% for tp in title %}
             <div class="col-lg-4">
                 <div class="card card-chart" style="height: 200px;">
@@ -31,27 +31,26 @@
 {% block javascripts %}
 <script>
     $(document).ready(function () {
-        var canv = document.getElementsByClassName('tp')
+        var canv = document.getElementById('dbord')
+        const id_exg = window.location.href.split('/').pop();
+        var d1 = new Date();
+        var d2 = new Date;
+        d2.setHours(d1.getHours()-3);
 
-        for (let i = 0; i < canv.length; i++) {
+        let response = fetch('/xgauster_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;chartset=utf-8'
+            },
+            body: JSON.stringify({
+                'id': id_exg,
+                'd1': d1,
+                'd2': d2
+            })
+        });
 
-            new Chart(canv[i], {
-                type: 'line',
-                data: {
-                    labels: [
-                        {% for item in time %}
-                        "{{ item }}",
-                        {% endfor %}
-                    ],
-                    datasets: [{
-                        data: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        borderWidth: 2
-                    }]
-                },
-                options: {}
-            });
-        };
+        let res = response.json;
+        console.log(res);
     });
 </script>
 {% endblock javascripts %}

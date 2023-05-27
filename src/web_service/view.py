@@ -75,12 +75,16 @@ def xgauster(id):
 
 
 
-@app.route('/xgauster', methods = ['GET'])
+@app.route('/xgauster_data', methods = ['POST'])
 def xgausterJSON():
         dh = DataHandler()
-        n = request.args.get('key', '')
-        if n:
-             events = dh.get_exh_events(n, d1, d2)
+
+        n = request.json['id']
+        d1 = request.json['d1']
+        d2 = request.json['d2']
+        
+        # if n:
+        #      events = dh.get_exh_events(n, d1, d2)
         data = {
             "dt": [
                 '2019-02-08 9:06:10',
