@@ -1,3 +1,5 @@
+MODEL_FILE_NAME_PREFIX = "model"
+NOT_NAN_SUFFIX = "_not_NaN"
 EXH_PREFIX = "E"
 EXH_SEPARATOR = "_"
 E_LIST_ID = [EXH_PREFIX + str(num) for num in range(0, 10)]
@@ -301,48 +303,6 @@ Y_LIST = {
     "Y_ЭКСГАУСТЕР А/М №9_ЭЛЕКТРОДВИГАТЕЛЬ ДСПУ-140-84-4 ЭКСГ. №9": E_LIST_ID[9] + EXH_SEPARATOR + "N174",
     "Y_ЭКСГАУСТЕР А/М №9_ЭЛЕКТРООБОРУДОВАНИЯ ЭКСГАУСТЕРА №9": E_LIST_ID[9] + EXH_SEPARATOR + "N175",
 }
-
-initual_data_PERIOD_TYPES = \
-        {
-            "table_name": "PERIOD_TYPES", "find_and_update_or_insert": True, "id_column": "id", "donot_commit": False,
-                "data":
-                [   {"id": 0, "period_name": "Один тик", "phidden": 1},
-                    {"id": 1, "period_name": "Одна минута", "phidden": 1},
-                    {"id": 2, "period_name": "5 минут", "phidden": 1},
-                    {"id": 3, "period_name": "10 минут", "phidden": 1},
-                    {"id": 4, "period_name": "15 минут", "phidden": 1},
-                    {"id": 5, "period_name": "30 минут", "phidden": 1},
-                    {"id": 6, "period_name": "Час", "phidden": 0},
-                    {"id": 7, "period_name": "День", "phidden": 1},
-                    {"id": 8, "period_name": "Неделя", "phidden": 1},
-                    {"id": 9, "period_name": "Месяц", "phidden": 1}
-                ]
-        }
-
-initual_data_STOCKS = \
-        {
-            "table_name": "STOCKS", "find_and_update_or_insert": True, "id_column": "trade_kod", "donot_commit": False,
-                "data":
-                [   {"trade_kod": "GAZP", "mfd_id": 330, "full_name": 'ПАО "Газпром", акция обыкновенная', "short_name": "ГАЗПРОМ а/о", "order_field": 1, "phidden": 0},
-                    {"trade_kod": "LKOH", "mfd_id": 632, "full_name": 'ПАО "Нефтяная компания "ЛУКОЙЛ", акция обыкновенная', "short_name": "ЛУКОЙЛ а/о", "order_field": 2, "phidden": 0},
-                    {"trade_kod": "ROS", "mfd_id": 1373, "full_name": 'ПАО "Нефтяная компания "РОСНЕФТЬ", акция обыкновенная', "short_name": "РОСНЕФТЬ а/о", "order_field": 2, "phidden": 0},
-                    {"trade_kod": "NLMK", "mfd_id": 913, "full_name": 'ПАО "Новолипецкий металлургический комбинат", акция обыкновенная', "short_name": "НЛМК", "order_field": 2, "phidden": 0},
-                    {"trade_kod": "MMK", "mfd_id": 716, "full_name": 'ПАО "Магнитогорский металлургический комбинат", акция обыкновенная', "short_name": "ММК а/о", "order_field": 2, "phidden": 0}
-                ]
-        }
-
-# Сгенерируем словарь с типами периодов:
-PERIOD_TYPES = {
-                initual_data_PERIOD_TYPES["data"][j]["period_name"]: initual_data_PERIOD_TYPES["data"][j]["id"]
-                    for j in range(1, len(initual_data_PERIOD_TYPES["data"]))
-               }
-
-DEFAULT_PERIOD_TYPE = PERIOD_TYPES["Час"]
-
-DATE_FORMAT_SLASH = "%Y/%m/%d"
-DATETIME_FORMAT_SLASH = "%Y/%m/%d %H:%M:%S"
-DATETIME_FORMAT_DASH = "%Y-%m-%d %H:%M:%S"
-DATETIME_FORMAT_IN_DB = DATETIME_FORMAT_DASH
 
 MODULES_PARAM_GROUPS = {
     "initdb": ["db", "constants", "utils"],
