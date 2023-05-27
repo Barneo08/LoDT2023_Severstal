@@ -1,7 +1,8 @@
 import datetime
 import sys
 import time
-import logging
+import src.constants as constants
+
 
 from src.config import *
 
@@ -101,12 +102,12 @@ def if_all_modules_exist(modules_list):
     return p_flag
 
 
-def log_print(text, module_name="NoModuleInfo", to_screen=True):
+def log_print(text, module_name="NoModuleInfo", to_screen=True, color=""):
     """
     Упрощение логирования событий, при необходимости вывод на экран.
     """
     if to_screen:
-        print(f"{module_name}:", text)
+        print(f"{module_name}:", f"{p(color=color, bold=1)}{text}{p()}")
 
     if CONFIG.DEBUG:
         logging.debug(f"{module_name}: {text}")
@@ -116,5 +117,37 @@ def get_home_dir():
     return os.path.abspath(os.curdir)
 
 
+def get_get_model_full_file_path(teh_place_id, model_type):
+    base_path = os.path.abspath(CONFIG.MODELS_FULL_PATH)
+    if not os.path.isdir(base_path):
+        os.makedirs(base_path)
+
+    file_name = f"{constants.MODEL_FILE_NAME_PREFIX}_{teh_place_id}_{model_type.upper().replace(' ', '')}.mdl"
+    ret_path = os.path.join(base_path, file_name, )
+
+    return ret_path
+
+
 def sep_digits(num, sep=" "):
     return '{0:,}'.format(num).replace(',', sep)
+
+
+def p(color="", bold=0):
+    color = color.lower().replace(" ", "")
+    if color == "black" or color == "":
+        color = "\033[0m"
+    elif color == "green" or color == "g":
+        color = "\033[92m"
+    elif color == "gray" or color == "gr":
+        color = "\033[90m"
+    elif color == "red" or color == "r":
+        color = "\033[91m"
+    elif color == "blue" or color == "b":
+        color = "\033[94m"
+    else:
+        color = ""
+
+    if bold == 1:
+        color += "\033[1m"
+
+    return (color)
