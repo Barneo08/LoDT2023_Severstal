@@ -1,19 +1,24 @@
 import sys
 import pandas as pd
 from tqdm import tqdm
+from datetime import datetime, timedelta
 
 from src.config import *
 import src.constants as constants
 import src.utils as utils
+from src.utils import p
+import src.db as db
+
+import warnings
 
 
 def load_data(sql_server_type):
     module_name = "Load raw data to DB"
 
     if not CONFIG.RAW_FILES_UPLOAD_ENABLED:
-        print("-------------------------------------------------------------------")
-        utils.log_print("Uploading raw files is blocked in the settings.", module_name=module_name)
-        print("-------------------------------------------------------------------")
+        print("----------------------------------------------------------------------")
+        utils.log_print("Uploading raw files is blocked in the CONFIG file", module_name=module_name, color="r")
+        print("----------------------------------------------------------------------")
         print()
         print("Terminated.")
         return
@@ -23,32 +28,31 @@ def load_data(sql_server_type):
         utils.log_print("One of the modules is missing. The program is terminated.", module_name="Load raw data to DB")
     else:
         # Создаём объект для работы с БД
-        import src.db as db
         dh = db.DataHandler(sql_server_type, keep_silence=False)
+        print()
 
         conf = {
-            "X_TRAIN_RAW": {"raw_data_file": "x_train.parquet", "columns_subs": constants.SENSOR_FIELD_NAMES_LIST},
-            "Y_TRAIN_RAW": {"raw_data_file": "y_train.parquet", "columns_subs": constants.Y_LIST},
-            "X_TEST_RAW": {"raw_data_file": "x_train.parquet", "columns_subs": constants.SENSOR_FIELD_NAMES_LIST},
+            "X_TRAIN_GROUPED": {"raw_data_file": CONFIG.X_TRAIN_FILE, "columns_subs": constants.SENSOR_FIELD_NAMES_LIST, "type": "train", "task": "group", "nan_enabled": True},
+            "Y_TRAIN": {"raw_data_file": CONFIG.Y_TRAIN_FILE, "columns_subs": constants.Y_LIST, "type": "prediction", "task": "unconverted", "nan_enabled": False},
+            "Y_TRAIN_GROUPED": {"raw_data_file": CONFIG.Y_TRAIN_FILE, "columns_subs": constants.Y_LIST, "type": "prediction", "task": "group", "nan_enabled": False},
+            "X_TEST_GROUPED": {"raw_data_file": CONFIG.X_TEST_FILE, "columns_subs": constants.SENSOR_FIELD_NAMES_LIST, "type": "test", "task": "group", "nan_enabled": True},
         }
 
         for raw_table_name in conf.keys():
+            # Создаём таймер
+            timer = utils.Timer(f"Таймер загрузки: {p(color='b', bold=1)}{raw_table_name}{p()}", only_on_show=False)
+
             # Получаем информация о загружаемой таблице
-            # raw_table_name = "Y_TRAIN_RAW"
+            # В нашем случае данные хранятся в файлах parquet
             file_path = os.path.join(os.path.abspath(os.curdir), CONFIG.RAW_DATA_FULL_PATH, conf[raw_table_name]["raw_data_file"])
             df = pd.read_parquet(file_path, engine="fastparquet")
-            # df = df.head(99)
 
-            # Заменим названия столбцов на удобные:
+            # Заменим названия столбцов на удобные из CONFIG:
             df.rename(columns=conf[raw_table_name]["columns_subs"], inplace=True)
 
-            # Создаём таймер
-            timer = utils.Timer("Общий таймер. Загрузка сырых данных.", only_on_show=False)
-
             rows = df.shape[0]
-            print(f"{raw_table_name}:")
             print(f"Количество строк для загрузки: {utils.sep_digits(rows)} шт.")
-            print(f"Загрузка осуществляется блоками по {utils.sep_digits(CONFIG.UPLOAD_ROWS)} строк.")
+            flag_for_first_print = True
 
             for element in constants.E_LIST_ID:
                 # Получим префикс (имя) для эксгаустера
@@ -57,8 +61,34 @@ def load_data(sql_server_type):
                 y_columns_list = sorted([one_column for one_column in df.columns if one_column[:len(e_name)] == e_name])
                 y_columns_list = sorted(y_columns_list)
                 if len(y_columns_list) != 0:
-                    # timer_element = utils.Timer(f"Эксгаустер: {element}")
                     df_2_load = df[y_columns_list]
+
+                    if conf[raw_table_name]["task"] == "group":
+                        if flag_for_first_print:
+                            min_gr = utils.sep_digits(CONFIG.MINUTES_ROWS_IN_GROUP)
+                            imm_depth = utils.sep_digits(CONFIG.ROWS_IMMERSION_DEPTH)
+                            imm_depth_in_min = utils.sep_digits(CONFIG.ROWS_IMMERSION_DEPTH * CONFIG.MINUTES_ROWS_IN_GROUP)
+                            print(f"Строки группируются по {min_gr} мин.")
+                            print(f"Глубина истории {imm_depth} записей, т.е. в сумме {imm_depth_in_min} мин.")
+                        # -----------------------------------------------
+                        df_2_load = preparation_mean_and_group(
+                            df=df_2_load,
+                            is_prediction=(conf[raw_table_name]["type"] == "prediction"),
+                            nan_enabled=conf[raw_table_name]["nan_enabled"],
+                            text=element,
+                        )
+                        # -----------------------------------------------
+                        if flag_for_first_print:
+                            flag_for_first_print = False
+                            print(f"Данные сгруппированы. Количество строк в итоговой таблице: {utils.sep_digits(df_2_load.shape[0])} шт.")
+                            if dh.sql_server != "Pandas":
+                                print(f"Загрузка осуществляется блоками по {utils.sep_digits(CONFIG.UPLOAD_ROWS)} строк.")
+
+                    if flag_for_first_print:
+                        flag_for_first_print = False
+                        if dh.sql_server != "Pandas":
+                            print(f"Загрузка осуществляется блоками по {utils.sep_digits(CONFIG.UPLOAD_ROWS)} строк.")
+
                     # Имя для таблицы:
                     table_name = e_name + raw_table_name
                     # Загружаем данные
@@ -68,67 +98,142 @@ def load_data(sql_server_type):
                     dh.execute(f'DROP TABLE IF EXISTS "{table_name}"')
                     dh.commit()
 
-                    # Загрузим данные частями по UPLOAD_ROWS
-                    def data_2_sql(num1, num2):
-                        df_2_load.iloc[num1: num2].to_sql(table_name, con=dh.connector, if_exists="append")
+                    if dh.sql_server == "Pandas":
+                        dh.connector.to_file(df_2_load, table_name)
+                    else:
+                        # Загрузим данные частями по UPLOAD_ROWS
+                        def data_2_sql(num1, num2):
+                            df_2_load.iloc[num1: num2].to_sql(table_name, con=dh.connector, if_exists="append")
 
-                    for num in tqdm(range(int(rows / CONFIG.UPLOAD_ROWS) + 1), ncols=75, desc=f"Эксгаузер: {element}"):
-                        data_2_sql(num * CONFIG.UPLOAD_ROWS, (num * CONFIG.UPLOAD_ROWS) + CONFIG.UPLOAD_ROWS)
+                        for num in tqdm(range(int(rows / CONFIG.UPLOAD_ROWS) + 1), ncols=75, desc=f"Эксгаузер: {element}"):
+                            data_2_sql(num * CONFIG.UPLOAD_ROWS, (num * CONFIG.UPLOAD_ROWS) + CONFIG.UPLOAD_ROWS)
 
             # Выведем информацию о времени исполнения блока кода:
             timer.show()
 
 
-if len(sys.argv) == 1:
-    print("--------------------------------------------")
-    print("Are you sure want to upload the raw data")
-    print("to the database for further processing?")
-    print()
-    print("By default, the data will be loaded to the SQLite.")
-    print("You can select PostgreSQL if you run the program with:")
-    print("--server PostgreSQL")
-    print()
-    print("Press 'Y' if yes:")
-    print("--------------------------------------------")
-    pressed_key = input().upper().replace(" ", "")
-    if pressed_key == "Y":
+def preparation_mean_and_group(df, is_prediction, nan_enabled, text=""):
+    # Здесь проставим признаки для NaN
+    # Добавим дубли столбцов, которые показывают есть или нет NaN (0 - есть, 1 - нет)
+    warnings.filterwarnings("ignore")
+    if CONFIG.CREATE_NAN_FLAGS and nan_enabled:
+        for one_col in df.columns:
+            df[one_col + constants.NOT_NAN_SUFFIX] = df[[one_col]].isna() * (-1) + 1
+
+    # Заполним NaN скользящим средним, а те, которые не заполнятся, то их - средним
+    df.fillna(df.rolling(CONFIG.MINUTES_ROWS_IN_GROUP * 60, min_periods=1).mean(), inplace=True)
+    df.fillna(df.mean(), inplace=True)
+    df.fillna(0, inplace=True)
+
+    # Проставим новое время, по которому потом сгруппируем в одно строку
+    df = df.reset_index()
+
+    # Создадим основу для группировки - уберём секунды и лишние минуты:
+    if is_prediction:
+        # Для обучения модели необходимо сместить имеющееся предсказание в прошлое на необходимое время:
+        fh_hours = CONFIG.HOURS_FORECAST_HORIZON
+        fh_minutes = CONFIG.MINUTES_FORECAST_HORIZON
+    else:
+        fh_hours = 0
+        fh_minutes = 0
+
+    df["DT"] = df["DT"].apply(
+        lambda x: x - timedelta(hours=fh_hours, minutes=fh_minutes, seconds=x.second) - timedelta(
+            minutes=(x.minute - ((x.minute // CONFIG.MINUTES_ROWS_IN_GROUP) * CONFIG.MINUTES_ROWS_IN_GROUP))
+            )
+    )
+
+    if is_prediction:
+        # Это файл с тренировочными предсказаниями.
+        # Для начала его надо сместить на время указанное в CONFIG.
+        df = df.reset_index()
+        df["DT"] = df["DT"].apply(lambda x: x - timedelta(hours=CONFIG.HOURS_FORECAST_HORIZON, minutes=CONFIG.MINUTES_FORECAST_HORIZON))
+        df = df.set_index("DT")
+
+        # Его группировать с выделением среднего нельзя.
+        # На группируемом диапазоне него должны остаться значение:
+        #  - М1 если оно было хотя бы раз;
+        #  - М3, если оно было хотя бы раз и не было М1;
+        #  - в противном случае.
+        for column_name in df.columns:
+            df.loc[df[column_name] == 1, column_name] = 10
+        df = df.groupby('DT').max()
+        for column_name in df.columns:
+            df.loc[df[column_name] == 10, column_name] = 1
+    else:
+        # Это файл с событиями и их мы усредняем:
+        df = df.groupby('DT').mean()
+
+        # Добавим справа столбцы из истории с глубиной CONFIG.MINUTES_ROWS_IN_GROUP.
+        df_hist = df.copy()
+        for step_num in tqdm(range(1, CONFIG.ROWS_IMMERSION_DEPTH + 1), ncols=75, desc=f"{text}: Добавление истории"):
+            df_hist = df_hist.reset_index()
+            df_hist["DT"] = df_hist["DT"].apply(lambda x: x + timedelta(minutes=CONFIG.MINUTES_ROWS_IN_GROUP))
+            df_hist = df_hist.set_index("DT")
+
+            df = df.merge(df_hist, left_index=True, right_index=True, suffixes=("", f"__L{step_num}"))
+
+    warnings.filterwarnings("default")
+
+    return df
+
+
+if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        print("--------------------------------------------")
+        print(f"Are you sure want to upload the raw data")
+        print(f"to the database for further processing?")
         print()
-        load_data("SQLite")
-    else:
-        print("Terminated.")
-else:
-    if len(sys.argv) == 2:
-        print("Not enough parameters.")
-        sys.exit(1)
+        print(f"By default, the data will be loaded to the {p(color='b', bold=1)}Pandas{p()}.")
+        print(f"You can select other DB if you run the program with:")
+        print(f"--server SQLite")
+        print(f"--server PostgreSQL")
+        print()
+        print(f"Press '{p(color='r', bold=1)}Y{p()}' if yes:")
+        print("--------------------------------------------")
+        pressed_key = input().upper().replace(" ", "")
+        if pressed_key == "Y":
+            print()
+            load_data("Pandas")
+            import src.prediction as prediction
 
-    elif len(sys.argv) == 3:
-        param_name = sys.argv[1].upper().replace(" ", "")
-        param_value = sys.argv[2].replace(" ", "")
-
-        if param_name.upper() == "--server".upper() or param_name == "-s".upper():
-            if param_value.upper() not in ["SQLite".upper(), "PostgreSQL".upper(), "SQLite+SQLAlchemy".upper()]:
-                print()
-                print(f"{param_value}: Unknown server type. Terminated.")
-            else:
-                print("--------------------------------------------")
-                print("All data will be deleted and reloaded.")
-                if param_value.upper() == "SQLite".upper():
-                    print("Uploading will take up to 20 minutes.")
-                else:
-                    print("Uploading will take up to 100 minutes.")
-                print()
-                print("Press 'Y' if yes:")
-                print("--------------------------------------------")
-
-                pressed_key = input().upper().replace(" ", "")
-                if pressed_key == "Y":
-                    print()
-                    load_data(param_value)
-                else:
-                    print("Terminated.")
+            prediction.build_and_save_all_models()
+            prediction.make_prediction_for_all_exh()
         else:
-            print("Error. Unknown parameter.")
-            sys.exit(1)
+            print("Terminated.")
     else:
-        print("Too many parameters.")
-        sys.exit(1)
+        if len(sys.argv) == 2:
+            print("Not enough parameters.")
+            sys.exit(1)
+
+        elif len(sys.argv) == 3:
+            param_name = sys.argv[1].upper().replace(" ", "")
+            param_value = sys.argv[2].replace(" ", "")
+
+            if param_name.upper() == "--server".upper() or param_name == "-s".upper():
+                if param_value.upper() not in ["Pandas".upper(), "SQLite".upper(), "PostgreSQL".upper(), "SQLite+SQLAlchemy".upper()]:
+                    print()
+                    print(f"{param_value}: Unknown server type. Terminated.")
+                else:
+                    print("--------------------------------------------")
+                    print("All data will be deleted and reloaded.")
+                    if param_value.upper() == "Pandas".upper():
+                        print("Uploading will take up to 20 minutes.")
+                    else:
+                        print("Uploading will take up to 100 minutes.")
+                    print()
+                    print("Press 'Y' if yes:")
+                    print("--------------------------------------------")
+
+                    pressed_key = input().upper().replace(" ", "")
+                    if pressed_key == "Y":
+                        print()
+                        load_data(param_value)
+                    else:
+                        print("Terminated.")
+            else:
+                print("Error. Unknown parameter.")
+                sys.exit(1)
+        else:
+            print("Too many parameters.")
+            sys.exit(1)
