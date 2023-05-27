@@ -71,4 +71,4 @@
 <h3 id="g_data_loading">11. Загрузка 'сырых' исходных данных</h3>
 Здесь будет информация о том как происходит загрузка первичных данных
 
-![DirTree](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/picts/Data2SQLServer.png?raw=tru)
+![DirTree](https://github.com/MikhailNebasov/LoDT2023_Severstal/blob/main/picts/ProcessingData.png?raw=tru)
