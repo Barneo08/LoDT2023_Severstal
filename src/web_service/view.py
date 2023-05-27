@@ -1,5 +1,7 @@
 from datetime import datetime
+
 import json
+from dateutil.parser import parse
 
 from flask import make_response, render_template
 from flask import request
@@ -10,34 +12,44 @@ from src.web_service.web_app import app
 from src.db import DataHandler
 
 
-# @app.route("/")
-# def index():
-#     title = "Стартовая страница"
-#     content_title = "content_title."
-#     content = "Здесь должен быть контент. Вот список:"
-
-#     stocks_list = [["First", "1111", "Иванов"], ["Second", "2222", "Петров"], ["Third", "3333", "Сидоров"]]
-#     my_list = []
-#     for one_stock in stocks_list:
-#         my_list = my_list + [["predicts/frame_" + one_stock[0], one_stock[2]]]
-
-#     return render_template("index.html", title=title, content_title=content_title, content=content, html_list=my_list)
-
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def index():
     dh = DataHandler()
     exg_list = dh.get_exh_list()
+    if request.method == 'POST':
+        d1 = request.form.get('d1')  # запрос к данным формы
+        d2 = request.form.get('d2')
+        try:
+            d2 = parse(d2)
+            d1 = parse(d1)
+        except:
+            d2= datetime.now()
+            d1= d2 - pd.Timedelta(hours=3)
+    else:
+        d2= datetime.now()
+        d1= (d2 - pd.Timedelta(hours=3))
 
-    return render_template("home/index.html", exg_list=exg_list)
+    for exg in exg_list:
+        events = dh.get_exh_events(exg['id'], d1, d2) 
+        if events['M1']['dt']:
+            exg['score'] = 1
+        elif events['M3']['dt']:
+            exg['score'] = 2
+        else:
+            exg['score'] = 0
+    
+    return render_template("home/index.html", exg_list=exg_list, date={'d1':d1, 'd2':d2})
 
 # @app.route('/xgauster/<index>')
 # def xgauster():
 #     return render_template("home/xgauster.html")
 
-@app.route('/xgauster/<id>')
+@app.route('/xgauster/<id>', methods=['GET'])
 def xgauster(id):
     dh = DataHandler()
-
+    d1 = request.args.get('b')
+    d2 = request.args.get('e')
+    print(d1, d2)
     exg_list = dh.get_exh_list() # для меню
 
     d2= datetime.now()
@@ -51,23 +63,6 @@ def xgauster(id):
     ex_num = id[1:]
 
     title = [name.split(f'А/М №{ex_num}_')[1] for name in tp_list['Names'] if f'А/М №{ex_num}' in name]
-    # print(title)
-
-
-    # for i in range(len(tp_list['IDs'])):
-    #     id = tp_list['IDs'][i]
-    #     events = dh.get_exh_events(id, d1, d2)
-    #     # print('*'*15)
-
-    #     m1 = pd.Series(events['M1']['dt']).dt.floor("T").to_list()
-    #     m3 = pd.Series(events['M3']['dt']).dt.floor("T").to_list()
-        # print(m1)
-        # df = pd.DataFrame(time)
-        # df[0] = df[0].dt.floor("T")
-        # df['M1'] = df[0].apply(lambda x: 2 if x in m1 else 0)
-        # df['M3'] = df[0].apply(lambda x: 1 if x in m3 else 0)
-        # # print(df['M3'].to_list())
-        # data.append({'title':title, 'id': id, 'm1':df['M1'].to_list(), 'm3':df['M3'].to_list()})
     return render_template("home/xgauster.html", title=title, exg_list=exg_list)
 
 
@@ -80,54 +75,31 @@ def xgausterJSON():
         dh = DataHandler()
 
         n = request.json['id']
-        d1 = request.json['d1']
-        d2 = request.json['d2']
-        
-        # if n:
-        #      events = dh.get_exh_events(n, d1, d2)
-        data = {
-            "dt": [
-                '2019-02-08 9:06:10',
-                '2019-02-08 9:06:20',
-                '2019-02-08 9:06:30',
-                '2019-02-08 9:06:40',
-                '2019-02-08 9:06:50',
-                '2019-02-08 9:07:00',
-                '2019-02-08 9:07:10',
-                '2019-02-08 9:07:20',
-                '2019-02-08 9:07:30',
-                '2019-02-08 9:07:40',
-                '2019-02-08 9:07:50',
-                '2019-02-08 9:08:00',
-                ],
-            "tR1": [
-                394.548,
-                394.5481,
-                394.5482,
-                394.5483,
-                394.5484,
-                394.5485,
-                394.5486,
-                394.5487,
-                394.5488,
-                394.5489,
-                394.549,
-                394.5491,
-            ],
-            "tR2":[
-                267.548,
-                267.5481,
-                267.5482,
-                267.5483,
-                267.5484,
-                267.5485,
-                267.5486,
-                267.5487,
-                267.5488,
-                267.5489,
-                267.549,
-                267.5491,
-            ]
-        }
+        d1 = parse(request.json['d1'])
+        d2 = parse(request.json['d2'])
+        time = pd.date_range(d1, d2, freq="1min")
+        data ={}
+        if n:
+            events = dh.get_exh_events(n, d1, d2)
 
+            m1 = pd.Series(events['M1']['dt']).dt.floor("T").to_list()
+            m3 = pd.Series(events['M3']['dt']).dt.floor("T").to_list()
+            df = pd.DataFrame(time, columns=['dt'])
+            df['dt'] = df['dt'].dt.floor("T")
+            df['M1'] = df['dt'].apply(lambda x: 1 if x in m1 else 0)
+            df['M3'] = df['dt'].apply(lambda x: 1 if x in m3 else 0)
+            print(df)
+        #     data1 = df[[0,'M1','size1']] \
+        #                 .rename({0:'x','M1':'y','size1':'r'}, axis=1) \
+        #                 .to_json(orient='records')
+        #     data3 = df[[0,'M3','size3']] \
+        #                 .rename({0:'x','M3':'y','size3':'r'}, axis=1) \
+        #                 .to_json(orient='records')
+        #     # print(data1)
+            
+        # data = {
+        #     "m1": data1,
+        #     "m3": data3
+        # }
+        print(data)
         return jsonify(data)

@@ -32,10 +32,19 @@
 <script>
     $(document).ready(function () {
         var canv = document.getElementById('dbord')
-        const id_exg = window.location.href.split('/').pop();
-        var d1 = new Date();
-        var d2 = new Date;
-        d2.setHours(d1.getHours()-3);
+        const url = window.location.href
+        const queryString = window.location.search;
+        let id_exg = url.split('/').pop().split('?')[0];
+        console.log(id_exg);
+        if(queryString){
+            const urlParams = new URLSearchParams(queryString);
+            var d1 = urlParams.get('b');
+            var d2 = urlParams.get('e');
+        }else{
+            d2 = new Date();
+            d1 = new Date();
+            d2.setHours(d2.getHours()+3);
+        }
 
         let response = fetch('/xgauster_data', {
             method: 'POST',
@@ -51,6 +60,7 @@
 
         let res = response.json;
         console.log(res);
+
     });
 </script>
 {% endblock javascripts %}

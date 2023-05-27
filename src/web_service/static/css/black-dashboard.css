@@ -8652,11 +8652,11 @@ a.text-darker:hover, a.text-darker:focus {
     margin-left: 30px !important; }
 
 .btn-primary {
-  background: #e14eca;
-  background-image: linear-gradient(to bottom left, #e14eca, #ba54f5, #e14eca);
+  background: #090781;
+  background-image: linear-gradient(to bottom left, #090781, #08073d, #090781);
   background-size: 210% 210%;
   background-position: top right;
-  background-color: #e14eca;
+  background-color: #090781;
   transition: all 0.15s ease;
   box-shadow: none;
   color: #ffffff; }
@@ -8664,9 +8664,9 @@ a.text-darker:hover, a.text-darker:focus {
     background-position: bottom left;
     transition: 0.3s ease-in-out; }
   .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .btn-primary:active:focus, .btn-primary:active:hover, .btn-primary.active:focus, .btn-primary.active:hover {
-    background-color: #ba54f5 !important;
-    background-image: linear-gradient(to bottom left, #e14eca, #ba54f5, #e14eca) !important;
-    background-image: -moz-linear-gradient(to bottom left, #e14eca, #ba54f5, #e14eca) !important;
+    background-color: #08073d !important;
+    background-image: linear-gradient(to bottom left, #090781, #08073d, #090781) !important;
+    background-image: -moz-linear-gradient(to bottom left, #090781, #08073d, #090781) !important;
     color: #ffffff;
     box-shadow: none; }
   .btn-primary:active {
@@ -8684,29 +8684,29 @@ a.text-darker:hover, a.text-darker:focus {
   fieldset[disabled] .btn-primary.focus,
   fieldset[disabled] .btn-primary:active,
   fieldset[disabled] .btn-primary.active {
-    background-color: #e14eca;
-    border-color: #e14eca; }
+    background-color: #090781;
+    border-color: #090781; }
   .btn-primary.btn-simple {
-    color: #e14eca;
-    border-color: #e14eca;
+    color: #090781;
+    border-color: #090781;
     background: transparent; }
     .btn-primary.btn-simple:hover, .btn-primary.btn-simple:focus, .btn-primary.btn-simple:active, .btn-primary.btn-simple:not(:disabled):not(.disabled):active {
-      color: #e14eca;
-      border-color: #e14eca;
+      color: #090781;
+      border-color: #090781;
       background-color: transparent !important;
       background-image: none !important;
       box-shadow: none; }
     .btn-primary.btn-simple.active {
-      border-color: #e14eca !important; }
+      border-color: #090781 !important; }
       .btn-primary.btn-simple.active:hover, .btn-primary.btn-simple.active:focus, .btn-primary.btn-simple.active:active, .btn-primary.btn-simple.active:not(:disabled):not(.disabled):active {
         color: #ffffff;
-        border-color: #e14eca;
-        background-image: linear-gradient(to bottom left, #e14eca, #ba54f5, #e14eca) !important;
-        background-image: -moz-linear-gradient(to bottom left, #e14eca, #ba54f5, #e14eca) !important;
+        border-color: #090781;
+        background-image: linear-gradient(to bottom left, #090781, #08073d, #090781) !important;
+        background-image: -moz-linear-gradient(to bottom left, #090781, #08073d, #090781) !important;
         background-color: #ba54f5 !important;
         box-shadow: none; }
   .btn-primary.btn-link {
-    color: #e14eca; }
+    color: #090781; }
     .btn-primary.btn-link:hover, .btn-primary.btn-link:focus, .btn-primary.btn-link:active {
       background-color: transparent !important;
       background-image: none !important;
@@ -9558,14 +9558,14 @@ fieldset[disabled]
   font-size: 0.75rem;
   transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, background-color 0.3s ease-in-out; }
   .form-control:focus {
-    border-color: #e14eca;
+    border-color: #3c39fc;
     background-color: transparent;
     box-shadow: none; }
     .form-control:focus + .input-group-append .input-group-text,
     .form-control:focus ~ .input-group-append .input-group-text,
     .form-control:focus + .input-group-prepend .input-group-text,
     .form-control:focus ~ .input-group-prepend .input-group-text {
-      border: 1px solid #e14eca;
+      border: 1px solid #3c39fc;
       border-left: none;
       background-color: transparent; }
   .has-success .form-control,
