@@ -13,8 +13,14 @@ else:
         DEBUG = True
         DB_FULL_PATH = "DBase"
         RAW_DATA_FULL_PATH = "indata"
+        X_TRAIN_FILE = "x_train.parquet"
+        Y_TRAIN_FILE = "y_train.parquet"
+        X_TEST_FILE = "x_test.parquet"
+        MODELS_FULL_PATH = "Models"
 
-        SQL_SERVER_TYPE_USED = "SQLite"  # (SQLite, PostgreSQL)
+        CREATE_NAN_FLAGS = True
+
+        SQL_SERVER_TYPE_USED = "Pandas"  # (SQLite, PostgreSQL, Pandas)
         SQL_SERVER_DB_NAME = "SeverStal_DB"
 
         PostgreSQL = {
@@ -23,8 +29,14 @@ else:
             "SQL_SERVER_PASSWORD": "123",
         }
 
-        UPLOAD_ROWS = 1_000_000
-        RAW_FILES_UPLOAD_ENABLED = False
+        UPLOAD_ROWS = 10_000
+
+        MINUTES_ROWS_IN_GROUP = 10  # Сколько минут, идущих подряд группировать в одну строку
+        ROWS_IMMERSION_DEPTH = int(5 * 60 / 10)  # С какой глубины поднимать строки на уровень текущей записи
+        HOURS_FORECAST_HORIZON = 3  # Горизонт планирования в часах (суммируется с минутами)
+        MINUTES_FORECAST_HORIZON = 10  # Горизонт планирования в минутах (суммируется с часами)
+
+        RAW_FILES_UPLOAD_ENABLED = True
         DB_READY = False
 
         def __init__(self):
