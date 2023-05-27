@@ -11,6 +11,57 @@ from datetime import datetime, timedelta
 import random
 
 
+class PandasClass:
+    db_path = None
+
+    def __init__(self, db_path):
+        self.db_path = db_path
+
+    def close(self):
+        pass
+
+    def to_file(self, df: pd.DataFrame, table_name):
+        save_file_ext = ".parquet"
+        if table_name[-len(save_file_ext):] == save_file_ext:
+            save_file_ext = ""
+
+        df.to_parquet(f"{os.path.join(self.db_path, table_name)}{save_file_ext}", engine='fastparquet', index=True)
+
+    def get_file_path(self, exh_id, type_data="", type_for="train"):
+        if type_data.upper().replace(" ", "") == "X":
+            file_type_data = "X"
+        elif type_data.upper().replace(" ", "") == "Y":
+            file_type_data = "Y"
+        else:
+            file_type_data = "Error FILE_TYPE_NAME"
+
+        if type_for == "train":
+            file_type_name = "TRAIN"
+        elif type_for == "test":
+            file_type_name = "TEST"
+        else:
+            file_type_name = "Error TYPE_FOR"
+
+        exh_id = exh_id.upper().replace(" ", "")
+        table_name = f"{exh_id}_{file_type_data}_{file_type_name}_GROUPED.parquet"
+        ret_file_name = f"{os.path.join(self.db_path, table_name)}"
+
+        return ret_file_name
+
+    @staticmethod
+    def cursor():
+        return None
+
+    def commit(self):
+        pass
+
+    def rollback(self):
+        pass
+
+    def execute(self, sql_command):
+        pass
+
+
 class DataHandler:
     """
     При создании экземпляра данного класса будет создан объект,
@@ -49,16 +100,20 @@ class DataHandler:
         # self.add_rows_from_struct()
 
     @staticmethod
-    def get_dbase_path():
+    def get_dbase_path(with_db_name=True):
         try:
             dbase_path = os.path.abspath(CONFIG.DB_FULL_PATH)
             if not os.path.isdir(dbase_path):
                 os.makedirs(dbase_path)
 
-            ret_path = os.path.join(dbase_path, CONFIG.SQL_SERVER_DB_NAME)
+            if with_db_name:
+                ret_path = os.path.join(dbase_path, CONFIG.SQL_SERVER_DB_NAME)
+            else:
+                ret_path = dbase_path
+
             return ret_path
         except OSError:
-            utils.log_print("Не удалось подготовить информацию о расположении базы данных.", module_name="get_dbase_path")
+            utils.log_print("Не удалось подготовить информацию о расположении данных.", module_name="get_dbase_path")
             return ""
 
     def __del__(self):
@@ -69,14 +124,17 @@ class DataHandler:
         if self.connector:
             self.close_handle()
             if not self.keep_silence:
-                print("Закрыли соединение с БД.")
+                print("Закрыли соединение с данными.")
 
     def get_handle(self):
         """
         Подключение к базе данных.
         """
         try:
-            if self.sql_server.upper() == "SQLite".upper():
+            if self.sql_server.upper() == "Pandas".upper():
+                self.sql_alchemy = False
+                self.connector = PandasClass(self.get_dbase_path(with_db_name=False))
+            elif self.sql_server.upper() == "SQLite".upper():
                 self.sql_alchemy = False
                 self.connector = sqlite.connect(self.get_dbase_path(), check_same_thread=False)
             elif self.sql_server.upper() == "SQLite+SQLAlchemy".upper():
@@ -96,16 +154,16 @@ class DataHandler:
 
             self.cursor = self.connector.cursor()
         except BaseException:
-            utils.log_print("get_connector: Возникла проблема с подключением к базе данных.", module_name="get_handle")
+            utils.log_print("get_connector: Возникла проблема с подключением к данным.", module_name="get_handle")
             if self.connector is None or self.engine is None:
                 self.close_handle()
             return False
         if self.connector or self.engine:
             if not self.keep_silence:
-                print("Установили соединение с БД.")
+                print("Подключились к данным.")
             return True
         else:
-            utils.log_print("get_connector: При установлении связи с БД возникли ошибки.", module_name="get_handle")
+            utils.log_print("get_connector: При установлении связи с данными возникли ошибки.", module_name="get_handle")
             return False
 
     def execute(self, sql_command):
@@ -154,7 +212,8 @@ class DataHandler:
 
         return ret_dict
 
-    def get_exh_events(self, exh_tp_id=None, dt_start=(datetime.now() - timedelta(hours=1)), dt_end=datetime.now()):
+    @staticmethod
+    def get_exh_events(exh_tp_id=None, dt_start=(datetime.now() - timedelta(hours=1)), dt_end=datetime.now()):
         if exh_tp_id is None:
             print("Необходимо указать идентификатор технического места.")
 
@@ -182,101 +241,5 @@ class DataHandler:
         if not self.connector:
             return False
         
-        # cur = self.connector.cursor()
-
-        # table_name = ""
-        # try:
-        #     cur.execute(f"CREATE TABLE IF NOT EXISTS {table_name} (mfd_id INTEGER NOT NULL, price_dt TIMESTAMP NOT NULL, id_period_type INTEGER NOT NULL, price_open REAL NOT NULL, price_min REAL NOT NULL, price_max REAL NOT NULL, price_close REAL NOT NULL, vol INTEGER NOT NULL, ppredict INTEGER NOT NULL)")
-        #     cur.execute("CREATE TRIGGER IF NOT EXISTS trig_STOCKS_PRICES_befor_insert BEFORE INSERT ON STOCKS_PRICES FOR EACH ROW BEGIN DELETE FROM STOCKS_PRICES WHERE mfd_id=NEW.mfd_id AND price_dt=NEW.price_dt AND id_period_type=NEW.id_period_type; END")
-        #     cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS unique_combination ON STOCKS_PRICES (mfd_id, price_dt, id_period_type)")
-        #     cur.execute("CREATE INDEX IF NOT EXISTS ppredict ON STOCKS_PRICES (ppredict)")
-        # except:
-        #     utils.log_print(f"create_tables: При создании таблицы {table_name} возникла ошибка.", module_name="intDB")
-        #     return False
-        # Так как ошибок не было, то выходим с True
         return True
 
-    def add_row(self, table_name, data, donot_commit=False):
-        """
-        Данная функция предназначена для ввода данных по одной строке.
-        Данные добавляются в таблице имя которой передано в параметре <table_name>.
-        Имя столбца идентификатора в таблице передается в параметре <id_column>.
-        Если параметр <find_and_update_or_insert>= False тогда переданные данные добавляются как новая строка.
-        Если параметр <find_and_update_or_insert>= True тогда сначала делается попытка
-        найти строку с соответствующим идентификатором. Если такая строка найдена тогда она обновляется,
-        а если не найдена тогда добавляется новая строка.
-        Если параметр <donot_commit>=True тогда по завершении метода commit не делается.
-
-        !!! Важно !!! Здесь далее приведён пример использования.
-
-        """
-        if not self.connector:
-            utils.log_print("add_row: У данного объекта отсутствует коннектор.", module_name="add_row")
-            return False
-
-        table_name = table_name.replace(" ", "").upper()
-        cur = self.connector.cursor()
-
-        if True:
-            if table_name == "Y_TRAIN_RAW":
-                sql_create_string = f"INSERT INTO {table_name} (DT ##ALL_OTHER##) VALUES(##?##)"
-
-                sql_help_str = ""
-                insert_data = [data["DT"]]
-                for element in constants.Y_LIST.keys():
-                    sql_help_str = sql_help_str + f", {constants.Y_LIST[element]}"
-                    insert_data.append(data[constants.Y_LIST[element]])
-
-                sql_create_string = sql_create_string.replace("##ALL_OTHER##", sql_help_str)
-                sql_create_string = sql_create_string.replace("##?##", "?" + ", ?" * sql_help_str.count(","))
-                insert_data = tuple(insert_data)
-
-                cur.execute(sql_create_string, insert_data)
-
-            elif table_name == "STOCKS_PRICES":
-                cur.execute("INSERT INTO STOCKS_PRICES (mfd_id, price_dt, id_period_type, price_open, price_min, price_max, price_close, vol, ppredict) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (data["mfd_id"], data["price_dt"], data["id_period_type"], data["price_open"], data["price_min"], data["price_max"], data["price_close"], data["vol"], data["ppredict"]))
-            else:
-                utils.log_print("Попытка добавить данные в несуществующую таблицу: " + table_name, module_name="add_row")
-                return False
-        try:
-            pass
-        except (sqlite.Error, sqlite.ProgrammingError, sqlite.DatabaseError, sqlite.IntegrityError, sqlite.OperationalError, sqlite.NotSupportedError):
-            utils.log_print(f"add_row: При добавлении строки в таблицу {table_name} возникла ошибка.", module_name="add_row")
-            if not donot_commit:
-                self.connector.rollback()
-
-            return False
-
-        if not donot_commit:
-            self.connector.commit()
-        # Так как ошибок не было, то выходим с True
-        return True
-
-    def get_stocks_prices_pd(self, mfd_id, id_period_type=constants.DEFAULT_PERIOD_TYPE, price_type="MAX", dt_begin="", dt_end="", ppredict=0):
-        """
-        Выборка цен на акцию по условию и предоставление данных в формате Pandas DataFrame.
-        """
-        if not self.connector:
-            return False
-        cur = self.connector.cursor()
-        try:
-            cur.execute("SELECT price_dt, price_{} AS price, vol FROM STOCKS_PRICES WHERE mfd_id=? and id_period_type=? AND ppredict=? AND price_dt BETWEEN ? AND ? ORDER BY price_dt".format(price_type.lower()), (mfd_id, id_period_type, ppredict, dt_begin, dt_end))
-            return pd.DataFrame(cur.fetchall(), columns=["price_dt", "price", "vol"])
-        except BaseException:
-            print("get_stocks_list: При попытке получить выборку из таблицы STOCKS_PRICES возникла ошибка.")
-            return False
-
-    @staticmethod
-    def load_stock_prises_from_file2df(file_name):
-        """
-        Загрузка информации о ценах из локального файла в формат Pandas DataFrame.
-        """
-        if not os.path.isfile(file_name):
-            print("load_stock_prises_from_file: Файл '{}' не найден.".format(file_name))
-            return False
-
-        print("Получаем данные о стоимости акций из текстового файла '{}'".format(file_name))
-        df = pd.read_csv(file_name, sep=";")
-        # Полученную таблицу нужно причесать:
-        return utils.prepare_df(df)
