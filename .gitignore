@@ -11,6 +11,7 @@ _local_*.*
 _tmp_Picts
 __pycache__
 DBase
+Models
 
 *.bat
 
