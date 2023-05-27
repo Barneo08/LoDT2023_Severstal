@@ -1,10 +1,13 @@
+from datetime import datetime
 import json
 
 from flask import make_response, render_template
 from flask import request
 from flask import jsonify
+import pandas as pd
 
 from src.web_service.web_app import app
+from src.db import DataHandler
 
 
 # @app.route("/")
@@ -22,22 +25,62 @@ from src.web_service.web_app import app
 
 @app.route("/")
 def index():
-    exg_list = [{'id':4, 'title': 'Агломашина №4', 'score': 0},
-                {'id':5, 'title': 'Агломашина №5', 'score': 0},
-                {'id':6, 'title': 'Агломашина №6', 'score': 1},
-                {'id':7, 'title': 'Агломашина №7', 'score': 0},
-                {'id':8, 'title': 'Агломашина №8', 'score': 2},
-                {'id':9, 'title': 'Агломашина №9', 'score': 0}]
+    dh = DataHandler()
+    exg_list = dh.get_exh_list()
 
     return render_template("home/index.html", exg_list=exg_list)
 
-@app.route('/xgauster/<int:index>')
-def xgauster():
-    return render_template("home/xgauster.html")
+# @app.route('/xgauster/<index>')
+# def xgauster():
+#     return render_template("home/xgauster.html")
+
+@app.route('/xgauster/<id>')
+def xgauster(id):
+    dh = DataHandler()
+
+    exg_list = dh.get_exh_list() # для меню
+
+    d2= datetime.now()
+    d1= d2 - pd.Timedelta(hours=3)
+
+    tp_list = dh.get_exh_tp_list(id)
+
+    # time = pd.date_range(d1, d2, freq="1min")
+
+    data = []
+    ex_num = id[1:]
+
+    title = [name.split(f'А/М №{ex_num}_')[1] for name in tp_list['Names'] if f'А/М №{ex_num}' in name]
+    # print(title)
+
+
+    # for i in range(len(tp_list['IDs'])):
+    #     id = tp_list['IDs'][i]
+    #     events = dh.get_exh_events(id, d1, d2)
+    #     # print('*'*15)
+
+    #     m1 = pd.Series(events['M1']['dt']).dt.floor("T").to_list()
+    #     m3 = pd.Series(events['M3']['dt']).dt.floor("T").to_list()
+        # print(m1)
+        # df = pd.DataFrame(time)
+        # df[0] = df[0].dt.floor("T")
+        # df['M1'] = df[0].apply(lambda x: 2 if x in m1 else 0)
+        # df['M3'] = df[0].apply(lambda x: 1 if x in m3 else 0)
+        # # print(df['M3'].to_list())
+        # data.append({'title':title, 'id': id, 'm1':df['M1'].to_list(), 'm3':df['M3'].to_list()})
+    return render_template("home/xgauster.html", title=title, exg_list=exg_list)
+
+
+
+
+
 
 @app.route('/xgauster', methods = ['GET'])
 def xgausterJSON():
+        dh = DataHandler()
         n = request.args.get('key', '')
+        if n:
+             events = dh.get_exh_events(n, d1, d2)
         data = {
             "dt": [
                 '2019-02-08 9:06:10',
@@ -82,13 +125,5 @@ def xgausterJSON():
                 267.5491,
             ]
         }
-
-        # response = app.response_class(
-        #     response=json.dumps(data),
-        #     status=200,
-        #     mimetype='application/json'
-        # )
-
-        # return make_response(jsonify(data), 200)
 
         return jsonify(data)

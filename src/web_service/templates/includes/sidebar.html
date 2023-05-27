@@ -13,17 +13,17 @@
                 </a>
             </div>
             <ul class="nav">
-                <li class="active">
+                <li class="{% if 'index' in segment %} active {% endif %}">
                     <a href="{{ url_for('index') }}">
                         <i class="tim-icons icon-chart-pie-36"></i>
                         <p>Dashboard</p>
                     </a>
                 </li>
-                {% for i in range(4, 10) %}
-                <li class="active">
-                    <a href="">
-                        <i class="tim-icons icon-single-02"></i>
-                        <p>Агломашина №{{i}}</p>
+                {% for i in exg_list %}
+                <li class="{% if 'xgauster' in segment %} active {% endif %}">
+                    <a href="{{ url_for('xgauster', id=i.id) }}">
+                        <i class="tim-icons icon-sound-wave"></i>
+                        <p>{{i.name}}</p>
                     </a>
                 </li>
                 {% endfor %}
