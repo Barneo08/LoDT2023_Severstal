@@ -50,9 +50,9 @@
                         <h5 class="card-category">{{exg.name}}</h5>
                         <h3 class="card-title">
                           <i class="tim-icons icon-bell-55 text-primary"></i> 
-                          {% if exg.score==1 %}
+                          {% if exg.status==1 %}
                             Error M1
-                          {% elif exg.score==2 %}
+                          {% elif exg.status==2 %}
                             Error M3
                           {% else %}
                             Norm
@@ -61,7 +61,7 @@
                     </div>
                     <div class="card-body">
                         <div class="chart-area" style="height:auto">
-                            <canvas id="exg{{exg.id}}" class="exgscore" data-score="{{exg.score}}"></canvas>
+                            <canvas id="exg{{exg.id}}" class="exgscore" data-score="{{exg.status}}"></canvas>
                         </div>
                     </div>
                 </div>
