@@ -192,6 +192,8 @@ class DataHandler:
         0: Нормально
         1: Останов - событие М1
         2: Событие М3
+
+        Статусы берутся одновременно из двух источников - из обучающей выборки и из прогноза.
         """
         if not CONFIG.DB_READY:
             ret_list = [
@@ -204,6 +206,33 @@ class DataHandler:
             ]
         else:
             ret_list = []
+            dh = DataHandler(CONFIG.SQL_SERVER_TYPE_USED, keep_silence=True)
+
+            def get_status(type_for):
+                y_file_path = dh.connector.get_file_path(exh_id, type_data="Y", type_for=type_for)
+                if os.path.isfile(y_file_path):
+                    df = pd.read_parquet(y_file_path, engine="fastparquet")
+                    is_m1 = (sum((df[(df.index >= dt_start) & (df.index <= dt_end)] == constants.M1_EVENT).sum()) != 0) * constants.M1_EVENT
+                    if is_m1:
+                        return constants.M1_EVENT
+                    is_m3 = (sum((df[(df.index >= dt_start) & (df.index <= dt_end)] == constants.M3_EVENT).sum()) != 0) * constants.M3_EVENT
+                    return is_m3
+                else:
+                    return 0
+
+            for exh_id in constants.E_DICT.values():
+                # Необходимо проверить два файла: test и train.
+                # Сначала проверяем test:
+                test_status = get_status(type_for="test")
+                train_status = get_status(type_for="train")
+                if (test_status == constants.M1_EVENT) or (train_status == constants.M1_EVENT):
+                    status = constants.M1_EVENT
+                elif (test_status == constants.M3_EVENT) or (train_status == constants.M3_EVENT):
+                    status = constants.M3_EVENT
+                else:
+                    status = 0
+
+                ret_list.append({"name": constants.EXH_NAME_BY_ID[exh_id], "id": exh_id, "status": status})
 
         return ret_list
 
@@ -242,9 +271,28 @@ class DataHandler:
                 "M3": [get_dt_sequence(dt_start, m3)],
             }
         else:
+            dh = DataHandler(CONFIG.SQL_SERVER_TYPE_USED, keep_silence=True)
+
+            def get_status(type_for):
+                y_file_path = dh.connector.get_file_path(constants.EXH_ID_BY_TP_ID[exh_tp_id], type_data="Y", type_for=type_for)
+                if os.path.isfile(y_file_path):
+                    df = pd.read_parquet(y_file_path, engine="fastparquet")
+                    df = df[(df.index >= dt_start) & (df.index <= dt_end)][[exh_tp_id]]
+                    m1_idx = df[df[exh_tp_id] == constants.M1_EVENT].index
+                    m3_idx = df[df[exh_tp_id] == constants.M3_EVENT].index
+
+                    return m1_idx, m3_idx
+                else:
+                    return [], []
+
+            m1_idx_test, m3_idx_test = get_status("test")
+            m1_idx_train, m3_idx_train = get_status("test")
+
             ret_dict = {
-                "M1": [],
-                "M3": [],
+                "M1": m1_idx_test,
+                "M3": m3_idx_test,
+                "M1_TRAIN": m1_idx_train,
+                "M3_TRAIN": m3_idx_train,
             }
 
         return ret_dict
