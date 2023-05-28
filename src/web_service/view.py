@@ -81,7 +81,7 @@ def xgausterJSON():
 
             dt = df['dt'].dt.strftime('%H:%M').to_json(orient="values")
             data1 = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M1_TEST'],df['size1'])]
-            data3 = [{'x':x,"y":y, "r":r} for x,y,r in zip(df['dt'],df['M3_TEST'],df['size3'])]
+            data3 = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M3_TEST'],df['size3'])]
             data1tr = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M1_TRAIN'],df['size1tr'])]
             data3tr = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M3_TRAIN'],df['size3tr'])]
             data = {
