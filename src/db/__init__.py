@@ -186,21 +186,24 @@ class DataHandler:
             self.connector.rollback()
 
     @staticmethod
-    def get_exh_list():
+    def get_exh_list(dt_start=(datetime.now() - timedelta(hours=1)), dt_end=datetime.now()):
         """
         Возвращает список эксгаутеров, их идентификаторы и статусы:
         0: Нормально
         1: Останов - событие М1
         2: Событие М3
         """
-        ret_list = [
-            {"name": "Эксгаустер 4", "id": "E4", "status": 0},
-            {"name": "Эксгаустер 5", "id": "E5", "status": 0},
-            {"name": "Эксгаустер 6", "id": "E6", "status": 2},
-            {"name": "Эксгаустер 7", "id": "E7", "status": 2},
-            {"name": "Эксгаустер 8", "id": "E8", "status": 1},
-            {"name": "Эксгаустер 9", "id": "E9", "status": 0},
-        ]
+        if not CONFIG.DB_READY:
+            ret_list = [
+                {"name": "Эксгаустер 4", "id": "E4", "status": 0},
+                {"name": "Эксгаустер 5", "id": "E5", "status": 0},
+                {"name": "Эксгаустер 6", "id": "E6", "status": 2},
+                {"name": "Эксгаустер 7", "id": "E7", "status": 2},
+                {"name": "Эксгаустер 8", "id": "E8", "status": 1},
+                {"name": "Эксгаустер 9", "id": "E9", "status": 0},
+            ]
+        else:
+            ret_list = []
 
         return ret_list
 
@@ -224,19 +227,25 @@ class DataHandler:
             print("Необходимо указать идентификатор технического места.")
 
         minutes = int((dt_end - dt_start).total_seconds() / 60)
-        m1 = sorted(random.sample(range(1, minutes), random.randint(1, 3)))
-        m3 = sorted(random.sample(range(1, minutes), random.randint(3, 20)))
+        if not CONFIG.DB_READY:
+            m1 = sorted(random.sample(range(1, minutes), random.randint(1, 3)))
+            m3 = sorted(random.sample(range(1, minutes), random.randint(3, 20)))
 
-        def get_dt_sequence(dt_begin, minutes_list):
-            ret_list = []
-            for one_minute in minutes_list:
-                ret_list.append(dt_begin + timedelta(minutes=one_minute))
-            return ret_list
+            def get_dt_sequence(dt_begin, minutes_list):
+                ret_list = []
+                for one_minute in minutes_list:
+                    ret_list.append(dt_begin + timedelta(minutes=one_minute))
+                return ret_list
 
-        ret_dict = {
-            "M1": [get_dt_sequence(dt_start, m1)],
-            "M3": [get_dt_sequence(dt_start, m3)],
-        }
+            ret_dict = {
+                "M1": [get_dt_sequence(dt_start, m1)],
+                "M3": [get_dt_sequence(dt_start, m3)],
+            }
+        else:
+            ret_dict = {
+                "M1": [],
+                "M3": [],
+            }
 
         return ret_dict
 
