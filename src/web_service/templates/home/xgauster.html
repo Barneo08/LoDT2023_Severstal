@@ -8,6 +8,23 @@
 {% block content %}
     <div class="content">
         <div id="dbord" class="row">
+        <div class="col-lg-12">
+            <div class="card card-chart" style="height: 50px;">
+                <div class="card-header">
+                    <h5 class="card-category" style="display: inline-block;">Предсказанные:&emsp;</h5>
+                    <img src="{{ url_for('static', filename='images/rhombus-l.png') }}" height="20"/>
+                    <h5 class="card-category" style="display: inline-block; color: rgba(255,221,50,1);">M3&emsp;</h5>
+                    <img src="{{ url_for('static', filename='images/star-l.png') }}" height="20"/>
+                    <h5 class="card-category" style="display: inline-block; color: rgba(212, 40, 40,1);">M1&emsp;</h5>
+                    <h5 class="card-category" style="display: inline-block;">&emsp;&emsp;Действительные::&emsp;</h5>
+                    <img src="{{ url_for('static', filename='images/rhombus-s.png') }}" height="12"/>
+                    <h5 class="card-category" style="display: inline-block; color: rgba(255,221,50,0.7);">M3&emsp;</h5>
+                    <img src="{{ url_for('static', filename='images/star-s.png') }}" height="12"/>
+                    <h5 class="card-category" style="display: inline-block; color: rgba(212, 40, 40,0.7);">M1&emsp;</h5>
+                </div>
+            </div>
+        </div>
+
             {% for tp in title %}
             <div class="col-lg-6">
                 <div class="card card-chart" style="height: 120px;">
@@ -35,7 +52,6 @@
         const url = window.location.href
         const queryString = window.location.search;
         let id_exg = url.split('/').pop().split('?')[0];
-        // console.log(id_exg);
         if(queryString){
             const urlParams = new URLSearchParams(queryString);
             var d1 = urlParams.get('b');
@@ -47,7 +63,6 @@
         }
 
         var canv = document.getElementsByClassName('tp')
-        // console.log(canv)
         for (let i = 0; i < canv.length; i++) {
             let tp_id = canv[i].getAttribute('id')
 
@@ -65,7 +80,6 @@
             })
             .then(response => response.json())
             .then(result => {
-            console.log(result['m1'])
             new Chart(canv[i], {
             type: 'bubble',
             data: {
