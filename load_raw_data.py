@@ -32,9 +32,9 @@ def load_data(sql_server_type):
         print()
 
         conf = {
-            "X_TRAIN_GROUPED": {"raw_data_file": CONFIG.X_TRAIN_FILE, "columns_subs": constants.SENSOR_FIELD_NAMES_LIST, "type": "train", "task": "group", "nan_enabled": True},
             "Y_TRAIN": {"raw_data_file": CONFIG.Y_TRAIN_FILE, "columns_subs": constants.Y_LIST, "type": "prediction", "task": "unconverted", "nan_enabled": False},
             "Y_TRAIN_GROUPED": {"raw_data_file": CONFIG.Y_TRAIN_FILE, "columns_subs": constants.Y_LIST, "type": "prediction", "task": "group", "nan_enabled": False},
+            "X_TRAIN_GROUPED": {"raw_data_file": CONFIG.X_TRAIN_FILE, "columns_subs": constants.SENSOR_FIELD_NAMES_LIST, "type": "train", "task": "group", "nan_enabled": True},
             "X_TEST_GROUPED": {"raw_data_file": CONFIG.X_TEST_FILE, "columns_subs": constants.SENSOR_FIELD_NAMES_LIST, "type": "test", "task": "group", "nan_enabled": True},
         }
 
@@ -83,6 +83,9 @@ def load_data(sql_server_type):
                             print(f"Данные сгруппированы. Количество строк в итоговой таблице: {utils.sep_digits(df_2_load.shape[0])} шт.")
                             if dh.sql_server != "Pandas":
                                 print(f"Загрузка осуществляется блоками по {utils.sep_digits(CONFIG.UPLOAD_ROWS)} строк.")
+                    elif conf[raw_table_name]["task"] == "unconverted" and conf[raw_table_name]["task"] == "prediction":
+                        pass
+
 
                     if flag_for_first_print:
                         flag_for_first_print = False
@@ -184,11 +187,11 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         print("--------------------------------------------")
         print(f"Вы действительно хотите загрузить 'сырые' данные")
-        print(f"в базу данных для последующей обработки и ?")
+        print(f"в базу данных для последующей обработки и")
         print(f"формирования моделей и прогнозов по техместам?")
         print()
-        print(f"По умолчанию данные будут загружены в структуру {p(color='b', bold=1)}Pandas{p()}.")
-        print(f"Вы можете использовать другую структуру хранения")
+        print(f"По умолчанию данные будут загружены в {p(color='b', bold=1)}Pandas{p()}.")
+        print(f"Вы можете использовать другую структуру хранения,")
         print(f"указав при запуски один из следующих параметров:")
         print(f"--server SQLite")
         print(f"--server PostgreSQL")
@@ -198,12 +201,20 @@ if __name__ == "__main__":
         print("--------------------------------------------")
         pressed_key = input().upper().replace(" ", "")
         if pressed_key == "ДА":
+            common_timer = utils.Timer(f"Общая длительность произведённой подготовки:", only_on_show=True)
             print()
             load_data("Pandas")
             import src.prediction as prediction
 
+            timer = utils.Timer(f"Длительность формирования моделей:", only_on_show=True)
             prediction.build_and_save_all_models()
+            timer.show()
+            print()
+            timer = utils.Timer(f"Длительность предсказаний:", only_on_show=True)
             prediction.make_prediction_for_all_exh()
+            timer.show()
+            print()
+            common_timer.show()
         else:
             print("Завершение работы.")
     else:
