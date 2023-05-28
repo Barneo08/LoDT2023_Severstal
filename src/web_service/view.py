@@ -29,7 +29,6 @@ def index():
         d1= (d2 - pd.Timedelta(hours=3))
 
     exg_list = dh.get_exh_list(d1, d2)
-    print(exg_list)
     
     return render_template("home/index.html", exg_list=exg_list, date={'d1':d1, 'd2':d2})
 
@@ -45,8 +44,6 @@ def xgauster(id):
     tp_list = dh.get_exh_tp_list(id)
 
     ex_num = id[1:]
-
-    print(tp_list)
 
     title = [{'id':id, 'name':name.split(f'А/М №{ex_num}_')[1]} for name, id in zip(tp_list['Names'],tp_list['IDs']) if f'А/М №{ex_num}' in name]
     return render_template("home/xgauster.html", title=title, exg_list=exg_list, date={'d1':d1, 'd2':d2})
@@ -84,7 +81,7 @@ def xgausterJSON():
 
             dt = df['dt'].dt.strftime('%H:%M').to_json(orient="values")
             data1 = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M1_TEST'],df['size1'])]
-            data3 = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M3_TEST'],df['size3'])]
+            data3 = [{'x':x,"y":y, "r":r} for x,y,r in zip(df['dt'],df['M3_TEST'],df['size3'])]
             data1tr = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M1_TRAIN'],df['size1tr'])]
             data3tr = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M3_TRAIN'],df['size3tr'])]
             data = {
