@@ -45,7 +45,7 @@
             {% for exg in exg_list %}
             <div class="col-lg-4">
                 <a href="{{ url_for('xgauster', id=exg.id)}}?b={{date.d1}}&e={{date.d2}}">
-                    <div class="card card-chart">
+                    <div class="card card-chart" style="height: 200px;">
                     <div class="card-header">
                         <h5 class="card-category">{{exg.name}}</h5>
                         <h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> Score </h3>
