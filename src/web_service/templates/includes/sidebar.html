@@ -16,13 +16,15 @@
                 <li class="{% if 'index' in segment %} active {% endif %}">
                     <a href="{{ url_for('index') }}">
                         <i class="tim-icons icon-chart-pie-36"></i>
-                        <p>Dashboard</p>
+                        <p>
+                            Dashboard
+                        </p>
                     </a>
                 </li>
                 {% for i in exg_list %}
                 <li class="{% if 'xgauster' in segment %} active {% endif %}">
-                    <a href="{{ url_for('xgauster', id=i.id) }}">
-                        <i class="tim-icons icon-sound-wave"></i>
+                    <a href="{{ url_for('xgauster', id=i.id) }}?b={{date.d1}}&e={{date.d2}}">
+                        <i class="tim-icons icon-sound-wave"> </i>
                         <p>{{i.name}}</p>
                     </a>
                 </li>
