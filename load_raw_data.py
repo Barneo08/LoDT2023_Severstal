@@ -17,15 +17,15 @@ def load_data(sql_server_type):
 
     if not CONFIG.RAW_FILES_UPLOAD_ENABLED:
         print("----------------------------------------------------------------------")
-        utils.log_print("Uploading raw files is blocked in the CONFIG file", module_name=module_name, color="r")
+        utils.log_print("Загрузка 'сырых' файлов заблокирована в концигурационном файле", module_name=module_name, color="r")
         print("----------------------------------------------------------------------")
         print()
         print("Terminated.")
         return
 
-    utils.log_print(f"Starting loading raw data to DBase ({sql_server_type})...", module_name=module_name)
+    utils.log_print(f"Начата загрузка 'сырых' данных в структуру ({sql_server_type})...", module_name=module_name)
     if not utils.if_all_modules_exist(constants.MODULES_PARAM_GROUPS["initdb"]):
-        utils.log_print("One of the modules is missing. The program is terminated.", module_name="Load raw data to DB")
+        utils.log_print("Один из модулей программы отсутствует. Работа прекращена.", module_name="Load raw data to DB")
     else:
         # Создаём объект для работы с БД
         dh = db.DataHandler(sql_server_type, keep_silence=False)
@@ -181,18 +181,21 @@ def preparation_mean_and_group(df, is_prediction, nan_enabled, text=""):
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         print("--------------------------------------------")
-        print(f"Are you sure want to upload the raw data")
-        print(f"to the database for further processing?")
+        print(f"Вы действительно хотите загрузить 'сырые' данные")
+        print(f"в базу данных для последующей обработки и ?")
+        print(f"формирования моделей и прогнозов по техместам?")
         print()
-        print(f"By default, the data will be loaded to the {p(color='b', bold=1)}Pandas{p()}.")
-        print(f"You can select other DB if you run the program with:")
+        print(f"По умолчанию данные будут загружены в структуру {p(color='b', bold=1)}Pandas{p()}.")
+        print(f"Вы можете использовать другую структуру хранения")
+        print(f"указав при запуски один из следующих параметров:")
         print(f"--server SQLite")
         print(f"--server PostgreSQL")
         print()
-        print(f"Press '{p(color='r', bold=1)}Y{p()}' if yes:")
+        print(f"Наберите на клавиатуре '{p(color='r', bold=1)}Да{p()}'")
+        print(f"и подтвердите действие, нажав Enter:")
         print("--------------------------------------------")
         pressed_key = input().upper().replace(" ", "")
-        if pressed_key == "Y":
+        if pressed_key == "Д":
             print()
             load_data("Pandas")
             import src.prediction as prediction
@@ -200,10 +203,10 @@ if __name__ == "__main__":
             prediction.build_and_save_all_models()
             prediction.make_prediction_for_all_exh()
         else:
-            print("Terminated.")
+            print("Завершение работы.")
     else:
         if len(sys.argv) == 2:
-            print("Not enough parameters.")
+            print("Не достаточный список параметров.")
             sys.exit(1)
 
         elif len(sys.argv) == 3:
@@ -211,29 +214,30 @@ if __name__ == "__main__":
             param_value = sys.argv[2].replace(" ", "")
 
             if param_name.upper() == "--server".upper() or param_name == "-s".upper():
+                print("Функциональность заблокирована.")
+                print("Завершение работы.")
                 if param_value.upper() not in ["Pandas".upper(), "SQLite".upper(), "PostgreSQL".upper(), "SQLite+SQLAlchemy".upper()]:
                     print()
                     print(f"{param_value}: Unknown server type. Terminated.")
                 else:
                     print("--------------------------------------------")
-                    print("All data will be deleted and reloaded.")
+                    print("Все имеющиеся данные будут удалены и перезаписаны.")
                     if param_value.upper() == "Pandas".upper():
-                        print("Uploading will take up to 20 minutes.")
-                    else:
-                        print("Uploading will take up to 100 minutes.")
+                        print("Загрузка займёт больше 1 часа.")
                     print()
-                    print("Press 'Y' if yes:")
+                    print(f"Наберите на клавиатуре '{p(color='r', bold=1)}Да{p()}'")
+                    print(f"и подтвердите действие, нажав Enter:")
                     print("--------------------------------------------")
 
                     pressed_key = input().upper().replace(" ", "")
-                    if pressed_key == "Y":
+                    if pressed_key == "Д":
                         print()
                         load_data(param_value)
                     else:
-                        print("Terminated.")
+                        print("Завершение работы.")
             else:
-                print("Error. Unknown parameter.")
+                print("Ошибка. Неизвестный параметр.")
                 sys.exit(1)
         else:
-            print("Too many parameters.")
+            print("Слишком много параметров.")
             sys.exit(1)
