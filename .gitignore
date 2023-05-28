@@ -14,6 +14,7 @@ DBase
 Models
 
 *.bat
+*.vsd
 
 debug.logs
 requirements.bat
