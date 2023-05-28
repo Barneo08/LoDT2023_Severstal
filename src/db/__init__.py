@@ -290,7 +290,7 @@ class DataHandler:
                     return [], []
 
             m1_idx_test, m3_idx_test = get_status("test")
-            m1_idx_train, m3_idx_train = get_status("test")
+            m1_idx_train, m3_idx_train = get_status("train")
 
             ret_dict = {
                 "M1_TEST": m1_idx_test,
@@ -298,7 +298,6 @@ class DataHandler:
                 "M1_TRAIN": m1_idx_train,
                 "M3_TRAIN": m3_idx_train,
             }
-
         return ret_dict
 
     def create_tables(self):
