@@ -1,9 +1,12 @@
+M1_EVENT = 1
+M3_EVENT = 2
 MODEL_FILE_NAME_PREFIX = "model"
 NOT_NAN_SUFFIX = "_not_NaN"
 EXH_PREFIX = "E"
 EXH_SEPARATOR = "_"
 E_LIST_ID = [EXH_PREFIX + str(num) for num in range(0, 10)]
 E_DICT = {"Эксгаустер " + str(num): E_LIST_ID[num] for num in range(4, 10)}
+EXH_NAME_BY_ID = {E_DICT[exh_name]: exh_name for exh_name in E_DICT.keys()}
 
 SENSOR_LIST = {
     "ЭКСГАУСТЕР 4. ТОК РОТОРА 1": {"BDName": E_LIST_ID[4] + EXH_SEPARATOR + "iRot1", "DispName": "Э4.iР1"},
@@ -303,6 +306,8 @@ Y_LIST = {
     "Y_ЭКСГАУСТЕР А/М №9_ЭЛЕКТРОДВИГАТЕЛЬ ДСПУ-140-84-4 ЭКСГ. №9": E_LIST_ID[9] + EXH_SEPARATOR + "N174",
     "Y_ЭКСГАУСТЕР А/М №9_ЭЛЕКТРООБОРУДОВАНИЯ ЭКСГАУСТЕРА №9": E_LIST_ID[9] + EXH_SEPARATOR + "N175",
 }
+
+EXH_ID_BY_TP_ID = {pm_name: pm_name.split(EXH_SEPARATOR)[0] for pm_name in Y_LIST.values()}
 
 MODULES_PARAM_GROUPS = {
     "initdb": ["db", "constants", "utils"],
