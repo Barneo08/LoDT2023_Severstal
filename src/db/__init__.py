@@ -191,10 +191,14 @@ class DataHandler:
         Возвращает словарь со списком эксгаутеров в качестве ключей
         и их идентификаторов в качестве значений
         """
-        ret_list = []
-        exh_list = sorted(constants.E_DICT.keys())
-        for exh in exh_list:
-            ret_list.append({"name": exh, "id": constants.E_DICT[exh]})
+        ret_list = [
+            {"name": "Эксгаустер 4", "id": "E4", "status": 0},
+            {"name": "Эксгаустер 5", "id": "E5", "status": 0},
+            {"name": "Эксгаустер 6", "id": "E6", "status": 2},
+            {"name": "Эксгаустер 7", "id": "E7", "status": 2},
+            {"name": "Эксгаустер 8", "id": "E8", "status": 1},
+            {"name": "Эксгаустер 9", "id": "E9", "status": 0},
+        ]
 
         return ret_list
 
