@@ -188,8 +188,10 @@ class DataHandler:
     @staticmethod
     def get_exh_list():
         """
-        Возвращает словарь со списком эксгаутеров в качестве ключей
-        и их идентификаторов в качестве значений
+        Возвращает список эксгаутеров, их идентификаторы и статусы:
+        0: Нормально
+        1: Останов - событие М1
+        2: Событие М3
         """
         ret_list = [
             {"name": "Эксгаустер 4", "id": "E4", "status": 0},
@@ -232,8 +234,8 @@ class DataHandler:
             return ret_list
 
         ret_dict = {
-            "M1": {"dt": get_dt_sequence(dt_start, m1)},
-            "M3": {"dt": get_dt_sequence(dt_start, m3)},
+            "M1": [get_dt_sequence(dt_start, m1)],
+            "M3": [get_dt_sequence(dt_start, m3)],
         }
 
         return ret_dict
