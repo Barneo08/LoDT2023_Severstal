@@ -52,7 +52,6 @@
         const url = window.location.href
         const queryString = window.location.search;
         let id_exg = url.split('/').pop().split('?')[0];
-        // console.log(id_exg);
         if(queryString){
             const urlParams = new URLSearchParams(queryString);
             var d1 = urlParams.get('b');
@@ -64,7 +63,6 @@
         }
 
         var canv = document.getElementsByClassName('tp')
-        // console.log(canv)
         for (let i = 0; i < canv.length; i++) {
             let tp_id = canv[i].getAttribute('id')
 
@@ -82,7 +80,6 @@
             })
             .then(response => response.json())
             .then(result => {
-            console.log(result['m1'])
             new Chart(canv[i], {
             type: 'bubble',
             data: {
