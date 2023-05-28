@@ -269,10 +269,10 @@ class DataHandler:
                 return ret_list
 
             ret_dict = {
-                "M1_TEST": [get_dt_sequence(dt_start, m1_test)],
-                "M3_TEST": [get_dt_sequence(dt_start, m3_test)],
-                "M1_TRAIN": [get_dt_sequence(dt_start, m1_train)],
-                "M3_TRAIN": [get_dt_sequence(dt_start, m3_train)],
+                "M1_TEST": get_dt_sequence(dt_start, m1_test),
+                "M3_TEST": get_dt_sequence(dt_start, m3_test),
+                "M1_TRAIN": get_dt_sequence(dt_start, m1_train),
+                "M3_TRAIN": get_dt_sequence(dt_start, m3_train),
             }
         else:
             dh = DataHandler(CONFIG.SQL_SERVER_TYPE_USED, keep_silence=True)
