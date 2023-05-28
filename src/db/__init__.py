@@ -257,8 +257,10 @@ class DataHandler:
 
         minutes = int((dt_end - dt_start).total_seconds() / 60)
         if not CONFIG.DB_READY:
-            m1 = sorted(random.sample(range(1, minutes), random.randint(1, 3)))
-            m3 = sorted(random.sample(range(1, minutes), random.randint(3, 20)))
+            m1_test = sorted(random.sample(range(1, minutes), random.randint(1, 3)))
+            m3_test = sorted(random.sample(range(1, minutes), random.randint(3, 20)))
+            m1_train = sorted(random.sample(range(1, minutes), random.randint(1, 3)))
+            m3_train = sorted(random.sample(range(1, minutes), random.randint(3, 20)))
 
             def get_dt_sequence(dt_begin, minutes_list):
                 ret_list = []
@@ -267,8 +269,10 @@ class DataHandler:
                 return ret_list
 
             ret_dict = {
-                "M1": [get_dt_sequence(dt_start, m1)],
-                "M3": [get_dt_sequence(dt_start, m3)],
+                "M1_TEST": [get_dt_sequence(dt_start, m1_test)],
+                "M3_TEST": [get_dt_sequence(dt_start, m3_test)],
+                "M1_TRAIN": [get_dt_sequence(dt_start, m1_train)],
+                "M3_TRAIN": [get_dt_sequence(dt_start, m3_train)],
             }
         else:
             dh = DataHandler(CONFIG.SQL_SERVER_TYPE_USED, keep_silence=True)
@@ -289,8 +293,8 @@ class DataHandler:
             m1_idx_train, m3_idx_train = get_status("test")
 
             ret_dict = {
-                "M1": m1_idx_test,
-                "M3": m3_idx_test,
+                "M1_TEST": m1_idx_test,
+                "M3_TEST": m3_idx_test,
                 "M1_TRAIN": m1_idx_train,
                 "M3_TRAIN": m3_idx_train,
             }
