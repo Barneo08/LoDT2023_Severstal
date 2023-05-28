@@ -13,9 +13,9 @@ else:
         DEBUG = True
         DB_FULL_PATH = "DBase"
         RAW_DATA_FULL_PATH = "indata"
-        X_TRAIN_FILE = "x_train.parquet"
+        X_TRAIN_FILE = "X_train.parquet"
         Y_TRAIN_FILE = "y_train.parquet"
-        X_TEST_FILE = "x_test.parquet"
+        X_TEST_FILE = "X_test.parquet"
         MODELS_FULL_PATH = "Models"
 
         CREATE_NAN_FLAGS = True
