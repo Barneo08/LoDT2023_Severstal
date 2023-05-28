@@ -2,7 +2,6 @@ import os.path
 
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-from tqdm import tqdm
 import joblib
 import warnings
 
@@ -12,42 +11,6 @@ import src.utils as utils
 
 
 warnings.filterwarnings('ignore')
-
-
-def prepare_prediction(X, X_test):
-    """
-        It's prepare some columns with information of
-        previous price and then make prediction using LinearRegression.
-    """
-    ndivider = X.shape[0]
-    for num_row in tqdm(range(X_test.shape[0])):
-        # Получим данные для обучения:
-        X_train = X.drop(["y"], axis=1)
-        y_train = X["y"]
-        
-        # Сформируем строку, на которой будем делать предсказание
-        X_row4predict = X_test[num_row:(num_row + 1)].copy()
-        # Скопируем из Х последнюю строку:
-        X_last_row = X.tail(1).copy()
-        # Сдвинем в тестовой строке все лаги на 1, заменив первый на целевой признак из обучающей выборки:
-        for j in range(constants.MAX_LAG_FOR_PREDICTION, 1, -1):
-            X_row4predict["lag_{}".format(j)] = X_last_row["lag_{}".format(j-1)].values[0]
-
-        # А первый лаг - это целевой признак:
-        X_row4predict["lag_1"] = X_last_row["y"].values[0]
-        # Обучим:
-        lr = LogisticRegression()
-        lr.fit(X_train, y_train)
-        # Сделаем предсказание, убрав столбец с целевым признаком:
-        prediction = lr.predict(X_row4predict.drop(["y"], axis=1))
-        X_row4predict["y"] = prediction[0]
-
-        # Добавим строку с предсказанием в обучающую выборку для дальнейшего использования:
-        # X_row4predict.index = [X.shape[0]]
-        X = X.append(X_row4predict)
-        X["y"] = X["y"]
-
-    return X[ndivider:]
 
 
 def make_prediction_for_one_teh_place(X, teh_place_id):
@@ -183,5 +146,3 @@ def prepare_dataset(exh_id, process_type="train"):
         df_y.drop(["TempColumn"], axis=1, inplace=True)
 
     return df_x, df_y
-
-
