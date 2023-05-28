@@ -48,12 +48,20 @@
                     <div class="card card-chart" style="height: 200px;">
                     <div class="card-header">
                         <h5 class="card-category">{{exg.name}}</h5>
-                        <h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> Score </h3>
+                        <h3 class="card-title">
+                          <i class="tim-icons icon-bell-55 text-primary"></i> 
+                          {% if exg.score==1 %}
+                            Error M1
+                          {% elif exg.score==2 %}
+                            Error M3
+                          {% else %}
+                            Norm
+                          {% endif %}
+                        </h3>
                     </div>
                     <div class="card-body">
                         <div class="chart-area" style="height:auto">
                             <canvas id="exg{{exg.id}}" class="exgscore" data-score="{{exg.score}}"></canvas>
-                            <!-- <canvas id="chartLinePurple"></canvas> -->
                         </div>
                     </div>
                 </div>
