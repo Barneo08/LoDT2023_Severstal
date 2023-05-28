@@ -81,61 +81,50 @@
             .then(response => response.json())
             .then(result => {
             new Chart(canv[i], {
-            type: 'bubble',
+            type: 'line',
             data: {
+                labels: result['dt'],
                 datasets: [{
-                    label: ["M1"],
+                    label: "M1",
                     borderColor: "rgba(212, 40, 40,1)",
                     data: result['m1'],
-                    pointStyle: 'star'
+                    pointStyle: 'star',
+                    showLine: false,
+                    pointRadius: 11,
                     }, {
-                    label: ["M3"],
+                    label: "M3",
                     borderColor: "rgba(255,221,50,1)",
                     data: result['m3'],
-                    pointStyle: 'rectRot'
+                    pointStyle: 'rectRot',
+                    showLine: false,
+                    pointRadius: 11,
                     }, {
-                    label: ["M1train"],
+                    label: "M1train",
                     borderColor: "rgba(212, 40, 40,0.5)",
                     data: result['m1tr'],
                     pointStyle: 'star',
-                    pointBorderWidth: 20
+                    showLine: false,
+                    pointRadius: 6,
                     }, {
-                    label: ["M3train"],
+                    label: "M3train",
                     borderColor: "rgba(255,221,50,0.5)",
                     data: result['m3tr'],
-                    pointStyle: 'rectRot'
+                    pointStyle: 'rectRot',
+                    showLine: false,
+                    pointRadius: 6,
                 }]
             },
             options: {
-                maintainAspectRatio: false,
+                // maintainAspectRatio: false,
                 legend: {
                     display: false
                 },
                 scales: {
-                    xAxes: [{
-                        // type: "time",
-                        // time: { 
-                        //     unit: 'hour',
-                        //     tooltipFormat: 'hA' 
-                        // },
-                        scaleLabel: {
-                            display: true,
-                        },
-                        gridLines: {
-                            display:false
-                        }
-                    }],
-                    yAxes: [{
+                    yAxes:[{
+                        min: 0,
+                        max: 1.2,
                         display: false,
-                        ticks: {
-                            suggestedMin: 0.9,    // minimum will be 0, unless there is a lower value.
-                            max: 1.3,
-                            // beginAtZero: false
-                        },
-                        gridLines: {
-                            display:false
-                        }
-                    }]
+                    }],
                 }
             }
             });

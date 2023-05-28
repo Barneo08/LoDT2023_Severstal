@@ -69,26 +69,17 @@ def xgausterJSON():
 
             df = pd.DataFrame(time, columns=['dt'])
             df['dt'] = df['dt'].dt.floor(step)
-            df['M1_TEST'] = df['dt'].apply(lambda x: 1 if x in m1 else 0)
-            df['size1'] = df['M1_TEST'] * 10
-            df['M3_TEST'] = df['dt'].apply(lambda x: 1 if x in m3 else 0)
-            df['size3'] = df['M3_TEST'] * 10
-            df['M1_TRAIN'] = df['dt'].apply(lambda x: 1.2 if x in m1tr else 0)
-            df['size1tr'] = df['M1_TRAIN'] * 5
-            df['M3_TRAIN'] = df['dt'].apply(lambda x: 1.2 if x in m3tr else 0)
-            df['size3tr'] = df['M3_TRAIN'] * 5
-            df['index'] = df.index
+            df['M1_TEST'] = df['dt'].apply(lambda x: 0.5 if x in m1 else -1)
+            df['M3_TEST'] = df['dt'].apply(lambda x: 0.5 if x in m3 else -1)
+            df['M1_TRAIN'] = df['dt'].apply(lambda x: 0.7 if x in m1tr else -1)
+            df['M3_TRAIN'] = df['dt'].apply(lambda x: 0.7 if x in m3tr else -1)
 
-            dt = df['dt'].dt.strftime('%H:%M').to_json(orient="values")
-            data1 = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M1_TEST'],df['size1'])]
-            data3 = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M3_TEST'],df['size3'])]
-            data1tr = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M1_TRAIN'],df['size1tr'])]
-            data3tr = [{'x':x.timestamp(),"y":y, "r":r} for x,y,r in zip(df['dt'],df['M3_TRAIN'],df['size3tr'])]
+            dt = df['dt'].dt.strftime('%Y-%m-%d %H:%M').to_list()
             data = {
-                "m1": data1,
-                "m3": data3,
-                "m1tr": data1tr,
-                "m3tr": data3tr,
+                "m1": df['M1_TEST'].to_list(),
+                "m3": df['M3_TEST'].to_list(),
+                "m1tr": df['M1_TRAIN'].to_list(),
+                "m3tr": df['M3_TRAIN'].to_list(),
                 'dt': dt
             }
         return jsonify(data)
