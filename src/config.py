@@ -31,6 +31,8 @@ else:
 
         UPLOAD_ROWS = 10_000
 
+        WEB_SERVER_IS_PUBLIC = False
+
         MINUTES_ROWS_IN_GROUP = 10  # Сколько минут, идущих подряд группировать в одну строку
         ROWS_IMMERSION_DEPTH = int(5 * 60 / 10)  # С какой глубины поднимать строки на уровень текущей записи
         HOURS_FORECAST_HORIZON = 3  # Горизонт планирования в часах (суммируется с минутами)
