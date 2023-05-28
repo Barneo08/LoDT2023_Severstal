@@ -35,6 +35,7 @@ else:
         ROWS_IMMERSION_DEPTH = int(5 * 60 / 10)  # С какой глубины поднимать строки на уровень текущей записи
         HOURS_FORECAST_HORIZON = 3  # Горизонт планирования в часах (суммируется с минутами)
         MINUTES_FORECAST_HORIZON = 10  # Горизонт планирования в минутах (суммируется с часами)
+        SAVE_ONLY_STABLE_AND_FIRST_ERROR = False  # В этом случае из Y удаляются все записи, идущие сразу после того как возникла ошибка.
 
         RAW_FILES_UPLOAD_ENABLED = True
         DB_READY = False
