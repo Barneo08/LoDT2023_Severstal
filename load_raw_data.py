@@ -173,6 +173,8 @@ def preparation_mean_and_group(df, is_prediction, nan_enabled, text=""):
 
             df = df.merge(df_hist, left_index=True, right_index=True, suffixes=("", f"__L{step_num}"))
 
+    if "index" in df.columns:
+        df.drop(["index"], axis=1, inplace=True)
     warnings.filterwarnings("default")
 
     return df
@@ -195,7 +197,7 @@ if __name__ == "__main__":
         print(f"и подтвердите действие, нажав Enter:")
         print("--------------------------------------------")
         pressed_key = input().upper().replace(" ", "")
-        if pressed_key == "Д":
+        if pressed_key == "ДА":
             print()
             load_data("Pandas")
             import src.prediction as prediction
@@ -230,7 +232,7 @@ if __name__ == "__main__":
                     print("--------------------------------------------")
 
                     pressed_key = input().upper().replace(" ", "")
-                    if pressed_key == "Д":
+                    if pressed_key == "ДА":
                         print()
                         load_data(param_value)
                     else:
